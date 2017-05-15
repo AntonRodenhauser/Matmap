@@ -1,0 +1,8 @@
+
+function TSindices=readAC2(ac2file, mapfile, calfile, window)
+
+TSindices=ioReadTS(ac2file,mapfile, calfile)
+%doesnt work if TSindices is a 
+TS{TSindices}.potvals=TS{TSindices}.potvals(window,:);
+TS{TSindices}.gain=TS{TSindices}.gain(window,:)
+TS{TSindices}.numleads=length(window)
