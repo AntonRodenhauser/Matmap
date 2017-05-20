@@ -7,7 +7,7 @@ function ts=DoBaseLineCorrection(TSindices,blpts,blwin)
 %     TSindices: either the index of TS to ts struct or the struct itself
 % output: 
 %     the ts itself
-%     also if index is passed, it also upgrades the TS structure
+%     also if (and only if) index is passed, it also upgrades the TS structure
 
 
 
