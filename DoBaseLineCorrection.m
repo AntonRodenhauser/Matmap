@@ -5,9 +5,16 @@ function ts=DoBaseLineCorrection(TSindices,blpts,blwin)
 
 % input:
 %     TSindices: either the index of TS to ts struct or the struct itself
+%     blpts: baselinepoints, the start and endpoints of linear regression
+%     line, something like [1  100]
+%     blwin: eg  5,  ein int, der angibt, wie viele punkte um die start und
+%     entpunkte zusätzlich mit berücksichtigt werden sollen.
 % output: 
-%     the ts itself
+%     the ts itself, with all leads "baselined"
 %     also if (and only if) index is passed, it also upgrades the TS structure
+% 
+% 
+% warnings:  this function does not upgrade ts.numleads and ts.numframes
 
 
 
@@ -43,8 +50,8 @@ if isnumeric(TSindices)
 elseif isstruct(TSindices)
     ts=TSindices;
     
-    numframes = ts.numframes;
-    numleads = ts.numleads;
+    numframes = size(ts.potvals,2);
+    numleads = size(ts.potvals,1);
     
     e = ones(size(blpts,1),1);
     startframe = median([e blpts(:,1) e*(numframes-blwin+1)],2);
