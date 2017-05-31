@@ -34,8 +34,8 @@ return
 function Init(filename)
 
     global SCRIPT SCRIPTDATA;
-    InitScript;
-    InitScriptData;
+    InitScript;    %initializes with default
+    InitScriptData;  
     
     if nargin == 0,
         filename = SCRIPT.SCRIPTFILE;
@@ -54,31 +54,20 @@ function Init(filename)
                 SCRIPT = setfield(SCRIPT,fn{p},getfield(script,fn{p}));
             end
         end
-      
         
-        fprintf(1,'Looking for ACQ or AC2 Files in this directory\n');
-
-        GetACQLabel;
-        LoadScriptData;
-        
-        handle = winProcessingScriptMenu2;
-        UpdateACQFiles(handle);        
-        
-    else
-        
-        GetACQLabel;
-        LoadScriptData;
-        
-        fprintf(1,'Looking for ACQ or AC2 Files in this directory\n');
-        handle = winProcessingScriptMenu2;
-        UpdateACQFiles(handle);        
-     end
+    end
+    fprintf(1,'Looking for ACQ or AC2 Files in this directory\n');
     
-    UpdateGroup;
+    
+    GetACQLabel;   % doesnt seem to work?!  but it's should update SCRIPT.ACQLABEL with a cell of strings containing 'run'/labels of acq files
+    LoadScriptData; %this loads the processingscript.mat and puts data into SCRIPTDATA
+        
+    UpdateGroup;       
     handle = winProcessingScriptSettings2;
-    UpdateFigure(handle);
+    UpdateFigure(handle);     
     handle = winProcessingScriptMenu2;
     UpdateFigure(handle);
+    UpdateACQFiles(handle);  % callback of "Input Directory", puts file list in main window
     
     SCRIPT.PWD = pwd;
       
@@ -314,7 +303,7 @@ function vec = mystr2num(str)
     return
 
 function str = mynum2str(vec)
-
+    
     if length(vec) == 1,
         str = num2str(vec);
     else
@@ -356,7 +345,8 @@ function str = mynum2str(vec)
      return
     
 function strs = commalist(str)
-
+    %converts input like 'a,b,c' or 'a, b, c' oder 'a;b, c' in a cell array
+    %{'a', 'b', 'c'}
     str = str(find(isspace(str)==0));
     ind = [0 sort([findstr(',',str) findstr(';',str)]) length(str)+1];
     for p=1:(length(ind)-1),
@@ -367,7 +357,7 @@ function strs = commalist(str)
     
 
 function UpdateFigure(handle)
-    % updates all Properties of all the children of handle with the values
+    % updates all Properties of all the children of handle with the corresponding values
     % stored in SCRIPT
     global SCRIPT;
     
@@ -376,7 +366,7 @@ function UpdateFigure(handle)
     end
     
     fn = fieldnames(SCRIPT);
-    for p=1:length(fn),
+    for p=1:length(fn)
         obj = findobj(allchild(handle),'tag',fn{p});
         if ~isempty(obj),
             objtype = getfield(SCRIPT.TYPE,fn{p});
@@ -428,6 +418,7 @@ function UpdateFigure(handle)
     return
     
 function LoadSettings(handle)
+% callback function to the 'load settings from file' button
 % asks user for a processingscript.mat file and loads the data of that into
 % SCRIPT  and uptdates all the gui figures 
     
@@ -604,7 +595,7 @@ function SelectFilter(handle)
     return
     
 function Browse(handle,ext,mode)
-
+    
     global SCRIPT;
     if nargin == 1,
         ext = 'mat';
@@ -667,13 +658,14 @@ function Browse(handle,ext,mode)
     return
     
 function UpdateACQFiles(handle)
-
+    % callback of "Input Directory", puts file list in main window
     GetACQLabel;
     GetACQFiles;
     UpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU'));
     return
     
 function GetACQLabel
+% doesnt seem to work?!  but it's should update SCRIPT.ACQLABEL with a cell of strings containing 'run'/labels of acq files
 
     global SCRIPT;
     
@@ -693,11 +685,11 @@ function GetACQLabel
         end
     end
     
-    for p=1:length(d), t{p} = d(p).name(1:(findstr(d(p).name,'-')-1)); end
+    for p=1:length(d), t{p} = d(p).name(1:(findstr(d(p).name,'-')-1)); end   %t is empty, since no '-' is in the filenames
     [B,I,J] = unique(t);
     [dummy,I] = max(hist(J,1:length(B)));
     
-    label = t{I};
+    label = t{I};    %empty,  doesnt work, script uses default?! sets label to run
     SCRIPT.ACQLABEL = label;
     
     cd(olddir);
@@ -705,7 +697,14 @@ function GetACQLabel
     return
 
 function GetACQFiles
-
+% this function finds all files in ACQDIR and updates the following fields accordingly:
+%     SCRIPT.ACQFILENUMBER     double array of the form
+%     [1:NumberOfFilesDisplayedInListbox
+%     SCRIPT.ACQLISTBOX        cellarray with strings for the listbox
+%     SCRIPT.ACQFILENAME       cellarray with all filenames in ACQDIR
+%     SCRIPT.ACQINFO           cellarray with a label for each file
+%     SCRIPT.ACQFILES          double array of selected files in the
+%     listbox
     global SCRIPT;
    
     oldfilenames = {};
@@ -716,12 +715,16 @@ function GetACQFiles
             end
         end
     end
+    %oldfilenames is now  cellarray with filenamestrings of only the
+    %selected files in listbox, eg {'Run0005.ac2'}, not of all files in dir
+ 
     
-    exts = commalist(SCRIPT.ACQEXT);
+    exts = commalist(SCRIPT.ACQEXT);      
     contain = commalist(SCRIPT.ACQCONTAIN);
     containnot = commalist(SCRIPT.ACQCONTAINNOT);
     
     olddir = pwd;
+    %change into SCRIPT.ACQDIR,if it exists and is not empty
     if ~isempty(SCRIPT.ACQDIR),
         if exist(SCRIPT.ACQDIR,'dir');
             if ~isempty(dir(SCRIPT.ACQDIR)),
@@ -730,6 +733,7 @@ function GetACQFiles
         end
     end
     
+    
     filenames = {};
     for p=1:length(exts),
         d = dir(sprintf('*%s',exts{p}));
@@ -737,9 +741,12 @@ function GetACQFiles
             filenames{end+1} = d(q).name;
         end
     end
+    % filenames is cellarray with all the filenames of files in folder, like 
+    %{'Ran0001.ac2'    'Ru0009.ac2'}
+    
     
     filterfilenames = {};
-    
+    %keep only files that contain ACQCONTAIN and not ACQCONTAINNOT
     if (length(contain)==1), if isempty(contain{1}), contain = {}; end, end
     if (length(containnot)==1), if isempty(containnot{1}), containnot = {}; end, end
     
@@ -772,6 +779,10 @@ function GetACQFiles
     
     filenames = sort(unique(filterfilenames));
     
+    % filenames is now cell of only the filenames in input folder, that
+    % obey rules specified by the user
+    
+    
     options.scantsdffile = 1;
    
     SCRIPT.ACQFILENUMBER = [];
@@ -786,7 +797,7 @@ function GetACQFiles
     end
     
     h = waitbar(0,'INDEXING AND READING FILES'); drawnow;
-    T = ioReadTSdata(filenames,options);
+    T = ioReadTSdata(filenames,options);    % read all the files in the TS structur
     waitbar(0.8,h);
     
     for p = 1:length(T),
@@ -808,19 +819,19 @@ function GetACQFiles
     return
     
 function SelectNoneACQ(handle)
-
+    %callback to 'selekt None ACQ
     global SCRIPT;
     SCRIPT.ACQFILES = [];
     UpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU'));
     
 function SelectAllACQ(handle)
-
+    %callback to 'select all' button
     global SCRIPT;
     SCRIPT.ACQFILES = SCRIPT.ACQFILENUMBER;
     UpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU'));
     
 function ACQSelectLabel(handle)
-    
+    %callback to 'Select Filelabels containing' button
     global SCRIPT;
     pat = SCRIPT.ACQPATTERN;
     sel = [];
@@ -874,21 +885,22 @@ function LoadOldParameters(handle)
             end
         end
         
-        UpdateGroup;
+        UpdateGroup; % initializes the group with defaults etc
         %GetACQLabel;
-        GetACQFiles;
+        GetACQFiles;   
         UpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
         UpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU'));
     end
     return
 
 function UpdateGroup(handle)
-    
+    % sets default values for the grouparrays, in case the user has created
+    % that group but not specified a value for everything
     global SCRIPT;
     len = length(SCRIPT.GROUPNAME);
     fn = fieldnames(SCRIPT.TYPE);
     for p=1:length(fn),
-        if strncmp(getfield(SCRIPT.TYPE,fn{p}),'group',5) == 1,
+        if strncmp(getfield(SCRIPT.TYPE,fn{p}),'group',5)   % GROUPNAME, GROUPLEADS, GROUPEXTENSION, GROUPEXTENSION, GROUPBADLEADS etc.  
             cellarray = getfield(SCRIPT,fn{p});
             default = getfield(SCRIPT.DEFAULT,fn{p});
             if length(cellarray) < len, cellarray{len} = default; end
@@ -990,13 +1002,7 @@ function PreLoopScript
 
     global SCRIPT SCRIPTDATA;
     
-    if length(SCRIPT.GROUPNAME) == 0,
-        errordlg('Please define GROUPS before processing the data');
-        return
-    end
-    
     % MAKE OUTPUT DIRECTORIES IF NEEDED
-    
     if SCRIPT.TSDFODIRON == 1,
         if ~exist(SCRIPT.TSDFODIR,'dir'),
             mkdir(SCRIPT.TSDFODIR);
@@ -1024,12 +1030,14 @@ function PreLoopScript
     
     % PREPARE SCRIPT FOR ACQ-FILES
     
-    filenames = SCRIPT.ACQFILENAME(SCRIPT.ACQFILES);
+    filenames = SCRIPT.ACQFILENAME(SCRIPT.ACQFILES);    % only take the files selected by the user
     index = [];
     
     for r=1:length(filenames),
         if ~isempty(strfind(filenames{r},'.acq')) || ~isempty(strfind(filenames{r}, '.ac2')), index = [index r]; end
-    end
+    end      %now index is all the indexes of filenames, that contain '-acq' or '.ac2'
+    
+    
     
     % IF WE HAVE ACQ FILES, THEY NEED MAPPING AND CALIBRATION
     % HENCE THAT IS ACCOMPLISHED HERE
@@ -1044,8 +1052,10 @@ function PreLoopScript
         
         acqfilename = filenames{index(1)};
         
-        isac2 = findstr('ac2', acqfilename);
         
+        %find the label: if no ac2: label is 'Run', else its all before -
+        %only looks at first file in filenames?!
+        isac2 = findstr('ac2', acqfilename); 
         if ~isempty(isac2)
             SCRIPT.ACQLABEL = 'Run';
             SCRIPT.ACQEXT = '.ac2';
@@ -1060,6 +1070,7 @@ function PreLoopScript
                 error('ERROR')
             end
         end
+        
         
         % THERE ARE ACQ FILES TO BE PROCESSED
         % FIRST CHECK THE EXISTANCE OF THE MAPPINGFILE
@@ -1080,11 +1091,14 @@ function PreLoopScript
         % THIS SECTION OF CODE DOES THE CALIBRATION FILE
         % GENERATION
     
+        
+        %%%%%%  start generating calibration file %%%%%%%%%%%%%%%
+        %% somehwhere here sigCalibrate8 is called
         if SCRIPT.DO_CALIBRATE == 1,
  
             if isempty(SCRIPT.CALIBRATIONACQ) & isempty(SCRIPT.CALIBRATIONFILE),
                 errordlg('Specify the filenumbers of the calibration measurements');
-                error('ERROR');
+                error('ERROR'); 
             end   
 		             
             if isempty(SCRIPT.CALIBRATIONFILE),
@@ -1117,6 +1131,10 @@ function PreLoopScript
 		    end 
         end
     end
+    %% end calibration file %%%
+    
+    
+    
     
     % RENDER A GLOBAL LIST OF ALL THE BADLEADS
     % THESE LEADS WILL NOT BE USED TO RENDER ANY RMS GRAPHICS
@@ -1129,10 +1147,14 @@ function PreLoopScript
         end
         
         leads = SCRIPT.GROUPLEADS{p};
-        ind = find((badleads>0)&(badleads<=length(leads)));
+        ind = find((badleads>0)&(badleads<=length(leads)))
         badleads = badleads(ind);
         SCRIPT.GBADLEADS{p} = badleads;
     end
+    % bad leads from badleadsfile now alsow used
+    % now GBADLEADS are only lead index between 1 and length(leads) (why?) 
+    % start counting at 1 for each group?!
+    
     
     % FIND MAXIMUM LEAD
     maxlead = 1;
@@ -1157,6 +1179,8 @@ function PreLoopScript
     return
 
 function ImportUserSettings(filename,index,fields)
+    % Imports the fields from SCRIPTDATA in the corresponding ts structure of
+    % TS. Identification via filename. 
 
     global SCRIPTDATA TS;
     
@@ -1182,7 +1206,7 @@ function ImportUserSettings(filename,index,fields)
     
     
 function ExportUserSettings(filename,index,fields)
-
+    % save TS{index}.fids.(fields) in myProcessingData 
     global SCRIPTDATA TS;
 
     % FIRST FIND THE FILENAME
@@ -1224,6 +1248,8 @@ function ExportUserSettings(filename,index,fields)
 % ANY CHANGES SHOULD BE DONE IN THIS FUNCTION
     
 function ProcessACQFile(inputfilename,inputfiledir)
+
+
 
     olddir = pwd;
     global SCRIPT TS SCRIPTDATA;

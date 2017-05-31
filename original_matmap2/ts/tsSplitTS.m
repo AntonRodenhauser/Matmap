@@ -17,20 +17,20 @@ function varargout = tsSplitTS(varargin)
     count = 0;
 
     if ~iscell(varargin{2}),
-    for p = 2:nargin,
-        if ischar(varargin{p}),
-            if count == 0,
-                msgError('You need to put the newfilename-extension after the channels definitions',5);
-                return
+        for p = 2:nargin,
+            if ischar(varargin{p}),
+                if count == 0,
+                    msgError('You need to put the newfilename-extension after the channels definitions',5);
+                    return
+                end
+                newext{count} = varargin{p};
             end
-            newext{count} = varargin{p};
+            if isnumeric(varargin{p}),
+                count = count+1;
+                newext{count} = '';
+                channels{count} = varargin{p};
+            end
         end
-        if isnumeric(varargin{p}),
-            count = count+1;
-            newext{count} = '';
-            channels{count} = varargin{p};
-        end
-    end
     end
 
     if iscell(varargin{2}),

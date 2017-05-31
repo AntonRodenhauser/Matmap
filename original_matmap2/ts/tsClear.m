@@ -1,4 +1,9 @@
 function tsClear(TSindices)
+% Bevore:  TS={ts, ts, ts, ts}
+% calling tsClear(2):    TS={[], ts, ts}
+% => just clears ts, does not change length(TS)
+
+
 % FUNCTION tsClear([TSindices])
 %
 % DESCRIPTION

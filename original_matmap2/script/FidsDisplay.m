@@ -20,8 +20,8 @@ function handle = FidsDisplay(varargin)
 
     if nargin > 0,
         
-        if ischar(varargin{1}),
-            feval(varargin{1},varargin{2:end});
+        if ischar(varargin{1}),     
+            feval(varargin{1},varargin{2:end});    % if input is char, then evaluate char (used for ButtonUp user interface callback fkts)
         else
             if nargin > 1,
                 handle = Init(varargin{1},varargin{2});
@@ -37,13 +37,16 @@ return
 
 
 function Navigation(handle,mode)
-
+    %callback function to Navigation bar. E.G. the "next" button has
+    %callback function:   FidsDisplay('Navigation',gcbf,'next')
+    %also callback to "apply" button!!
+    
     global SCRIPT;
     
     switch mode
     case {'prev','next','stop','redo','back'},
         SCRIPT.NAVIGATION = mode;
-        set(handle,'DeleteFcn','');
+        set(handle,'DeleteFcn','');  % normally, DeleteFcn is: FidsDisplay('Navigation',gcbf,'stop')  (why?!)
         delete(handle);
     case {'apply'}
   
@@ -59,7 +62,8 @@ function Navigation(handle,mode)
     return
 
 function SetupNavigationBar(handle)
-
+    % sets up Filename, Filelabel etc in the top bar (right to navigation
+    % bar)
     global SCRIPT TS;
     tsindex = SCRIPT.CURRENTTS;
     
@@ -77,7 +81,8 @@ function SetupNavigationBar(handle)
 
     
 function handle = Init(tsindex,mode)
-
+    %initialisation function, essentially the first function that is run,
+    %also opens the gui figure
     global SCRIPT;
 
     if nargin > 0,
@@ -89,8 +94,8 @@ function handle = Init(tsindex,mode)
 
     handle = winFidsDisplay;
     InitFiducials(handle,mode);
-    InitDisplayButtons(handle);
-    InitMouseFunctions(handle);
+    InitDisplayButtons(handle);  
+    InitMouseFunctions(handle); %sets callback functions for user interface (eg 'ButtonUpFcn'
     
     SetupNavigationBar(handle);
     SetupDisplay(handle);
@@ -100,11 +105,14 @@ function handle = Init(tsindex,mode)
 
 function SetFids(handle)
     
-    %callback function to "Fiducials" Window (in the middle on the left
-    %(global Fids group fids local fids
+    %callback function to the three buttons ('Global Fids', Group
+    % Fids') in the "Fiducials" Window (middle left up)
     
-    % window is figure.   sets the value-Value of all children of figure with tag
-    % FIDSGLOBAL (etc) to 1 (or 0 etc)
+    % makes sure that only one of the three buttons ('Global Fids', Group
+    % Fids', 'Local Fids' is selected at the same time. All three buttons
+    % have same callback function (this one), but different tags..
+    
+    % then it udates Axes accordingly (by calling DisplayFiducials)
 
     global FIDSDISPLAY;
 
@@ -218,7 +226,7 @@ function InitFiducials(handle,mode)
     return
 
 function FidsButton(handle)
-    %callback to middle down left
+    %callback to middle-down left  and complete down.  
 
     global SCRIPT
     
@@ -240,17 +248,19 @@ function FidsButton(handle)
     return
     
 function DisplayFiducials
-
+    % this functions plotts the lines/patches when u select the fiducials
+    % (the line u can move around with your mouse)
+    
     global FIDSDISPLAY SCRIPT;
     
     % GLOBAL EVENTS
     events = FIDSDISPLAY.EVENTS{1};
-     if ~isempty(events.handle), index = find(ishandle(events.handle(:)) & (events.handle(:) ~= 0)); delete(events.handle(index)); end
+     if ~isempty(events.handle), index = find(ishandle(events.handle(:)) & (events.handle(:) ~= 0)); delete(events.handle(index)); end   %delete any existing lines
     events.handle = [];
     ywin = FIDSDISPLAY.YWIN;
     if FIDSDISPLAY.SELFIDS == 1, colorlist = events.colorlist; else colorlist = events.colorlistgray; end
     
-    for p=1:size(events.value,2),
+    for p=1:size(events.value,2),    %   for p=[1: anzahl zu plottender linien]
         switch events.typelist(events.type(p)),
             case 1, % normal fiducial
                 v = events.value(1,p,1);
@@ -330,7 +340,7 @@ function DisplayFiducials
     return
     
   function InitMouseFunctions(handle)
-      %A. defines callbacks for UserInput
+      % defines callbacks for UserInput
 
     global FIDSDISPLAY;
    
@@ -409,7 +419,7 @@ function InitDisplayButtons(handle),
     return
     
 function DisplayButton(handle)
-    % callback to  links oben
+    % callback to  links oben, to all 5 "mini dropdown-menues")
     global SCRIPT;
     
     tag = get(handle,'tag');
@@ -429,6 +439,9 @@ function DisplayButton(handle)
    return
  
 function SetupDisplay(handle)
+%      no plotting, but everything else with axes, particualrely:
+%         - sets up some start values for xlim, ylim, sets up axes and slider handles
+%         - makes the FD.SIGNAL values,   (RMS and scaling of potvals)
 
     pointer = get(handle,'pointer');
     set(handle,'pointer','watch');
@@ -473,12 +486,12 @@ function SetupDisplay(handle)
     end    
     
     switch SCRIPT.DISPLAYTYPEF,
-        case 1,
+        case 1,     % global fids selected
             ch  = []; 
-            for p=groups, 
+            for p=groups,     
                 leads = SCRIPT.GROUPLEADS{p};
-                index = find(TS{tsindex}.leadinfo(leads)==0);
-                ch = [ch leads(index)]; 
+                index = find(TS{tsindex}.leadinfo(leads)==0);  % leadinfo seems to be 0 everywhere?!
+                ch = [ch leads(index)];   % ch is leads only of the leads of the groubs selected, not of all leads
             end 
             FIDSDISPLAY.SIGNAL = sqrt(mean(TS{tsindex}.potvals(ch,:).^2));
             FIDSDISPLAY.SIGNAL = FIDSDISPLAY.SIGNAL-min(FIDSDISPLAY.SIGNAL);
@@ -570,7 +583,7 @@ function SetupDisplay(handle)
             FIDSDISPLAY.SIGNAL = s*FIDSDISPLAY.SIGNAL;
     end
     
-    if SCRIPT.DISPLAYTYPEF == 3,
+    if SCRIPT.DISPLAYTYPEF == 3
         FIDSDISPLAY.SIGNAL = 0.5*FIDSDISPLAY.SIGNAL+0.5;
     end
     
@@ -618,7 +631,7 @@ function UpdateSlider(handle)
     
     
 function UpdateDisplay(handle)
-
+    %plots the FD.SIGNAL,  makes the plot..  also calls  DisplayFiducials
     pointer = get(handle,'pointer');
     set(handle,'pointer','watch');
 
@@ -795,24 +808,24 @@ function ZoomUp(handle)
     
     
 function ButtonDown(handle)
-   	
+   	%callback for mouse click
     global FIDSDISPLAY;
     
-    seltype = get(gcbf,'SelectionType');
-    events = FIDSDISPLAY.EVENTS{FIDSDISPLAY.SELFIDS}; 
+    seltype = get(gcbf,'SelectionType');   % double click, right click etc
+    events = FIDSDISPLAY.EVENTS{FIDSDISPLAY.SELFIDS}; %local, group, or global fids
     
     point = get(FIDSDISPLAY.AXES,'CurrentPoint');
     t = point(1,1); y = point(1,2);
     
     xwin = FIDSDISPLAY.XWIN;
     ywin = FIDSDISPLAY.YWIN;
-    if (t>xwin(1))&(t<xwin(2))&(y>ywin(1))&(y<ywin(2)),
-        if ~strcmp(seltype,'alt'),
-      		events = FindClosestEvent(events,t,y);
+    if (t>xwin(1))&(t<xwin(2))&(y>ywin(1))&(y<ywin(2)),     % if mouseclick within axes
+        if ~strcmp(seltype,'alt'),                          % if  no a "right click"
+      		events = FindClosestEvent(events,t,y);       % update sel, sel1, sel2
             if events.sel(1) > 0, 
-                events = SetClosestEvent(events,t,y);
+                events = SetClosestEvent(events,t,y);    % 
     	    else
-                events = AddEvent(events,t,y);
+                events = AddEvent(events,t,y);        % this gets apparently never called..
 	        end
         else
          	events = AddEvent(events,t,y);
@@ -863,10 +876,14 @@ function ButtonUp(handle)
         
 
  function events = FindClosestEvent(events,t,y)
-    
+    % returns events untouched, exept that sel1, sel2 sel3 are changed:
+    % sel=1 => erster balken am nächsten zu input t,  sel=2  =>2. balken am nächstn  
+    % sel2=1  => erste Strich von balken am nächsten,  sel2=2  => zweiter strich näher
+    % alle sel sind 0, falls isempty(value)
+    %sel3 ist bei global gleich 1, ansonsten ist sel3 glaub lead..
     global FIDSDISPLAY;
  
-    if isempty(events.value), 
+    if isempty(events.value),                                         %sels are all 0 if first time
         events.sel = 0;
         events.sel2 = 0;
         events.sel3 = 0;
@@ -875,11 +892,12 @@ function ButtonUp(handle)
             
     switch events.class,
         case 1,
-            tt = abs(permute(events.value(1,:,:),[3 2 1])-t);
-            [events.sel2,events.sel] = find(tt == min(tt(:)));
-            events.sel = events.sel(1);
-            events.sel2 = events.sel2(1);
+            tt = abs(permute(events.value(1,:,:),[3 2 1])-t);   % tt=[ AbstZu1StrOf1Line, AbstZu1StrOf2Line; AbstZu2StrOf1Line, AbstZu2StrOf2Line], abstand von mouseclick (2x2x1) matrix)
+            [events.sel2,events.sel] = find(tt == min(tt(:)));   %sel, sel2 und sel3 are indices closest line to mouseclick
+            events.sel = events.sel(1);         % sel=1 => erster balken am nächsten,  sel=2  =>2. balken am nächstn                 
+            events.sel2 = events.sel2(1);       % sel2=1  => erste Strich von balken am nächsten,  sel2=2  => zweiter strich näher
             events.sel3 = 1;
+
         case 2,
             numchannels = size(FIDSDISPLAY.SIGNAL,1);
             ch = median([ 1 numchannels-floor(y)  numchannels]);
@@ -908,7 +926,7 @@ function ButtonUp(handle)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function events = SetClosestEvent(events,t,y)
-
+    
     s = events.sel;
     s2 = events.sel2;
     s3 = events.sel3;
@@ -916,14 +934,14 @@ function events = SetClosestEvent(events,t,y)
     if s(1) == 0, return; end
     
     switch events.typelist(events.type(s)),
-               case 1,
-                    for w=s3,
+               case 1
+                    for w=s3
                         if (events.handle(w,s) > 0)&(ishandle(events.handle(w,s))), set(events.handle(w,s),'XData',[t t]); end
                         events.value(w,s,[1 2]) = [t t];
                     end
                     %drawnow;
                 case 2,
-                    for w=s3,
+                    for w=s3
                         events.value(w,s,s2) = t;
                         t1 = events.value(w,s,1);
                         t2 = events.value(w,s,2);
@@ -997,7 +1015,7 @@ function events = SetClosestEvent(events,t,y)
 
     for i = 1:size(intervalstart,2),
         S = signal(intervalstart(i):intervalend(i));
-        [dummy,ind] = max(S);
+        [~,ind] = max(S);
         events(i) = ind(max([1 round(length(ind)/2)])) + intervalstart(i) - 1;
     end
     
@@ -1007,99 +1025,104 @@ function events = SetClosestEvent(events,t,y)
 %  AddEvent                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function events = AddEvent(events,t,y)
-
-  global FIDSDISPLAY SCRIPT;
-  newtype = FIDSDISPLAY.NEWFIDSTYPE;
-
-  switch(events.typelist(newtype)),
-      case 1,
-          events.value(1:events.maxn,end+1,:) = t*ones(events.maxn,1,2);
-          events.type(end+1) = newtype;
-          events.handle(1:events.maxn,end+1) = zeros(events.maxn,1);
-          events.sel = length(events.type);
-          events.sel2 = 1;
-          events.sel3 = 1:events.maxn;
-      case 2,
-          events.value(1:events.maxn,end+1,:) = t*ones(events.maxn,1,2);
-          events.type(end+1) = newtype;
-          events.handle(1:events.maxn,end+1) = zeros(events.maxn,1);
-          events.sel = length(events.type);
-          events.sel2 = 2;
-          events.sel3 = 1:events.maxn;
-      case 3,
-          events.value(1:events.maxn,end+1,1) = t*ones(events.maxn,1,1);
-          events.value(1:events.maxn,end,2) = (t+events.dt)*ones(events.maxn,1,1);
-          events.type(end+1) = newtype;
-          events.handle(1:events.maxn,end+1) = zeros(events.maxn,1);
-          events.sel = length(events.type);
-          events.sel2 = 1;
-          events.sel3 = 1:events.maxn;
-  end
-  
-  ywin = FIDSDISPLAY.YWIN;
-  s = events.sel;
-  switch events.class,
-      case 1,
-            switch events.typelist(events.type(s)),
-                case 1, % normal fiducial
-                    v = events.value(1,s,1);
-                    events.handle(1,s) = line('parent',events.axes,'Xdata',[v v],'Ydata',ywin,'Color',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
-                case {2,3}, % interval fiducial/ fixed intereval fiducial
-                    v = events.value(1,s,1);
-                    v2 = events.value(1,s,2);
-                    events.handle(1,s) = patch('parent',events.axes,'Xdata',[v v v2 v2],'Ydata',[ywin ywin([2 1])],'FaceColor',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
-            end
-        case 2,
-          numchannels = size(FIDSDISPLAY.SIGNAL,1);
-          chend = numchannels - max([floor(ywin(1)) 0]);
-          chstart = numchannels - min([ceil(ywin(2)) numchannels])+1;
-          index = chstart:chend;
-          ch = [];
-          
-          for q=1:max(FIDSDISPLAY.LEADGROUP),
-              nindex = index(find(FIDSDISPLAY.LEADGROUP(index)==q));
-              if isempty(nindex), continue; end
-              ydata = numchannels-[min(nindex)-1 max(nindex)];
-              switch events.typelist(events.type(s)),
-                  case 1, % normal fiducial
-                      v = events.value(q,s,1);
-                      events.handle(q,s) = line('parent',events.axes,'Xdata',[v v],'Ydata',ydata,'Color',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
-                  case {2,3}, % interval fiducial/ fixed intereval fiducial
-                      v = events.value(q,s,1);
-                      v2 = events.value(q,s,2);
-                      events.handle(q,s) = patch('parent',events.axes,'Xdata',[v v v2 v2],'Ydata',[ydata ydata([2 1])],'FaceColor',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
-              end
-              ch = [ch q];
-          end
-          
-      case 3,
-           numchannels = size(FIDSDISPLAY.SIGNAL,1);
-           chend = numchannels - max([floor(ywin(1)) 0]);
-           chstart = numchannels - min([ceil(ywin(2)) numchannels])+1;
-           index = FIDSDISPLAY.LEAD(chstart:chend);
-           ch = [];
-           
-           for q=index,
-               ydata = numchannels-[q-1 q];
-               switch events.typelist(events.type(s)),
-                  case 1, % normal fiducial
-                      v = events.value(q,s,1);
-                      events.handle(q,s) = line('parent',events.axes,'Xdata',[v v],'Ydata',ydata,'Color',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
-                  case {2,3}, % interval fiducial/ fixed intereval fiducial
-                      v = events.value(q,s,1);
-                      v2 = events.value(q,s,2);
-                      events.handle(q,s) = patch('parent',events.axes,'Xdata',[v v v2 v2],'Ydata',[ydata ydata([2 1])],'FaceColor',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
-              end
-              ch =[ch q];
-          end
-  end
-  % drawnow;
-  
-  if SCRIPT.FIDSLOOPFIDS ==  1,
-      FIDSDISPLAY.NEWFIDSTYPE = events.next(FIDSDISPLAY.NEWFIDSTYPE);
-  end
-return   
+% function events = AddEvent(events,t,y)
+%     % line() bzw patch() wird hier aufgerufen
+%   
+%   disp('AddEvent exexuted')  
+%   
+%   global FIDSDISPLAY SCRIPT;
+%   newtype = FIDSDISPLAY.NEWFIDSTYPE;
+% 
+%   switch(events.typelist(newtype)),
+%       case 1,
+%           events.value(1:events.maxn,end+1,:) = t*ones(events.maxn,1,2);
+%           events.type(end+1) = newtype;
+%           events.handle(1:events.maxn,end+1) = zeros(events.maxn,1);
+%           events.sel = length(events.type);
+%           events.sel2 = 1;
+%           events.sel3 = 1:events.maxn;
+%       case 2,
+%           disp('zu beginn ist events:')
+%           events %a
+%           events.value(1:events.maxn,end+1,:) = t*ones(events.maxn,1,2);  
+%           events.type(end+1) = newtype;
+%           events.handle(1:events.maxn,end+1) = zeros(events.maxn,1);       % handles initialisieren
+%           events.sel = length(events.type);
+%           events.sel2 = 2;
+%           events.sel3 = 1:events.maxn;
+%       case 3,
+%           events.value(1:events.maxn,end+1,1) = t*ones(events.maxn,1,1);
+%           events.value(1:events.maxn,end,2) = (t+events.dt)*ones(events.maxn,1,1);
+%           events.type(end+1) = newtype;
+%           events.handle(1:events.maxn,end+1) = zeros(events.maxn,1);
+%           events.sel = length(events.type);
+%           events.sel2 = 1;
+%           events.sel3 = 1:events.maxn;
+%   end
+%   
+%   ywin = FIDSDISPLAY.YWIN;
+%   s = events.sel;
+%   switch events.class,
+%       case 1,
+%             switch events.typelist(events.type(s)),
+%                 case 1, % normal fiducial
+%                     v = events.value(1,s,1);
+%                     events.handle(1,s) = line('parent',events.axes,'Xdata',[v v],'Ydata',ywin,'Color',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
+%                 case {2,3}, % interval fiducial/ fixed intereval fiducial
+%                     v = events.value(1,s,1);
+%                     v2 = events.value(1,s,2);
+%                     events.handle(1,s) = patch('parent',events.axes,'Xdata',[v v v2 v2],'Ydata',[ywin ywin([2 1])],'FaceColor',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
+%             end
+%         case 2,
+%           numchannels = size(FIDSDISPLAY.SIGNAL,1);
+%           chend = numchannels - max([floor(ywin(1)) 0]);
+%           chstart = numchannels - min([ceil(ywin(2)) numchannels])+1;
+%           index = chstart:chend;
+%           ch = [];
+%           
+%           for q=1:max(FIDSDISPLAY.LEADGROUP),
+%               nindex = index(find(FIDSDISPLAY.LEADGROUP(index)==q));
+%               if isempty(nindex), continue; end
+%               ydata = numchannels-[min(nindex)-1 max(nindex)];
+%               switch events.typelist(events.type(s)),
+%                   case 1, % normal fiducial
+%                       v = events.value(q,s,1);
+%                       events.handle(q,s) = line('parent',events.axes,'Xdata',[v v],'Ydata',ydata,'Color',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
+%                   case {2,3}, % interval fiducial/ fixed intereval fiducial
+%                       v = events.value(q,s,1);
+%                       v2 = events.value(q,s,2);
+%                       events.handle(q,s) = patch('parent',events.axes,'Xdata',[v v v2 v2],'Ydata',[ydata ydata([2 1])],'FaceColor',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
+%               end
+%               ch = [ch q];
+%           end
+%           
+%       case 3,
+%            numchannels = size(FIDSDISPLAY.SIGNAL,1);
+%            chend = numchannels - max([floor(ywin(1)) 0]);
+%            chstart = numchannels - min([ceil(ywin(2)) numchannels])+1;
+%            index = FIDSDISPLAY.LEAD(chstart:chend);
+%            ch = [];
+%            
+%            for q=index,
+%                ydata = numchannels-[q-1 q];
+%                switch events.typelist(events.type(s)),
+%                   case 1, % normal fiducial
+%                       v = events.value(q,s,1);
+%                       events.handle(q,s) = line('parent',events.axes,'Xdata',[v v],'Ydata',ydata,'Color',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
+%                   case {2,3}, % interval fiducial/ fixed intereval fiducial
+%                       v = events.value(q,s,1);
+%                       v2 = events.value(q,s,2);
+%                       events.handle(q,s) = patch('parent',events.axes,'Xdata',[v v v2 v2],'Ydata',[ydata ydata([2 1])],'FaceColor',events.colorlist{events.type(s)},'hittest','off','erasemode','xor','linewidth',events.linewidth{events.type(s)},'linestyle',events.linestyle{events.type(s)});
+%               end
+%               ch =[ch q];
+%           end
+%   end
+%   % drawnow;
+%   
+%   if SCRIPT.FIDSLOOPFIDS ==  1,
+%       FIDSDISPLAY.NEWFIDSTYPE = events.next(FIDSDISPLAY.NEWFIDSTYPE);
+%   end
+% return   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  DeleteEvent                    %
@@ -1467,6 +1490,7 @@ function DetectActivation(handle)
     
     
 function FidsToEvents
+    %puts ts.fids  to EVENTS
 
     global TS FIDSDISPLAY SCRIPT;
 
@@ -1482,7 +1506,7 @@ function FidsToEvents
     
     for q=1:length(fids),
         if fids(q).type == 1,
-            pind = [pind q]; pval = [pval mean(fids(q).value)*isamplefreq];
+            pind = [pind q]; pval = [pval mean(fids(q).value)*isamplefreq];    
         end
         if fids(q).type == 4,
             qind = [qind q]; qval = [qval mean(fids(q).value)*isamplefreq];

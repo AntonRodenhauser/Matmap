@@ -1,4 +1,9 @@
 function tsDeal(TSindices,fieldname,contents)
+% sets TS{TSindices}.(fieldname)=contents   (only ONE fieldname!! different
+% contents for different TSindices)
+
+
+
 % FUNCTION tsDeal(TSindices,fieldname,contents)
 %
 % DESCRIPTION
