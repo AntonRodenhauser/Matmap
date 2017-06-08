@@ -1,4 +1,9 @@
 function TSindices = tsNew(number)
+%  if TS={[], ts1, ts2, [], []},   then tsNew(3) returns [1,4,5], tsNew(1)
+%  returns 1.    this functin doesnt change TS in any way.
+
+
+
 % function TSindices = tsNew(number)
 % 
 % This function scan the TS global and locates empty spots, if

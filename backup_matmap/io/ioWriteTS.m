@@ -57,7 +57,7 @@ if ~isfield(options,'scirunmat'), options.scirunmat = 0; end
 % PS append is not used it is reserved for future usage
 
 
-if ~isempty(TSindices) & ~isempty(tsRecord),
+if ~isempty(TSindices) & ~isempty(tsRecord)
     msgError('This function needs or indices in the TS structure or structures representing the timeseries data, a combination is not supported yet');
     return;
 end
@@ -68,25 +68,25 @@ global TS;							% need this one :)
 % All the data that needs to be saved is temporily stored in this array and lateron
 % removed again. So we can still use the same mex files. 
 
-if ~isempty(tsRecord),
+if ~isempty(tsRecord)
     TSindices = tsNew(length(tsRecord));
-    for p=1:length(tsRecord), 
+    for p=1:length(tsRecord)
         TS{TSindices(p)} = tsRecord{p};
     end
     tsRecord = 1;
 end
 
 
-if ~isempty(files.dfc),
+if ~isempty(files.dfc)
     msgError('DFC support has not been implemented yet',2);
 end
 
-if length(files.tsdfc) > 1,
+if length(files.tsdfc) > 1
     msgError('Only one tsdfc file can be used for writing fiducials',5);
     return
 end    
 
-if (isempty(files.tsdf))&(options.tsdfconly==0)&(isempty(files.mat)),
+if (isempty(files.tsdf))&(options.tsdfconly==0)&(isempty(files.mat))
 
     % Start building a vector with the new filenames
     
@@ -97,8 +97,8 @@ if (isempty(files.tsdf))&(options.tsdfconly==0)&(isempty(files.mat)),
         [filename,tsnumber] = utilStripNumber(TS{p}.filename);
         [pn,fn,ext] = fileparts(filename);				% remove file extension
         filename = fullfile(pn,fn);				% we know we want to save it as tsdf anyway
-        if ~isempty(tsnumber),
-            filename = sprintf('%s_%d',filename,tsnumber)	% put the timeseries number at the end if we need one
+        if ~isempty(tsnumber)
+            filename = sprintf('%s_%d',filename,tsnumber);	% put the timeseries number at the end if we need one
         end 
 
         isacq = 0;
@@ -109,8 +109,8 @@ if (isempty(files.tsdf))&(options.tsdfconly==0)&(isempty(files.mat)),
         
         if exist([filename '.tsdf'],'file'), fileexist = 1; end   
         
-        if (~isfield(TS{p},'newfileext')),
-	        if (oworiginal ~= 1) & (ismat ~= 1) & (isacq ~= 1) & (fileexist == 1),
+        if (~isfield(TS{p},'newfileext'))
+	        if (oworiginal ~= 1) & (ismat ~= 1) & (isacq ~= 1) & (fileexist == 1)
              	TS{p}.newfileext = '_copy';				% if not there just fill out the default
             else
                 TS{p}.newfileext = '';
@@ -118,19 +118,19 @@ if (isempty(files.tsdf))&(options.tsdfconly==0)&(isempty(files.mat)),
         end    
         newfileext = TS{p}.newfileext;
         
-	    if (oworiginal ~= 1) & (ismat ~= 1) & (isacq ~= 1) & (fileexist == 1),					% if the original file is not to be overwritten, we always put a new extenstion at the end of the filename, so we never overwrite original data!
-            if isempty(newfileext),
+	    if (oworiginal ~= 1) & (ismat ~= 1) & (isacq ~= 1) & (fileexist == 1)				% if the original file is not to be overwritten, we always put a new extenstion at the end of the filename, so we never overwrite original data!
+            if isempty(newfileext)
                 newfileext = '_copy';
             end
         end
        
         [dummy,fn,ext2] = fileparts(newfileext);
         
-        if (strcmp(ext2,'.tsdf') == 1),
+        if (strcmp(ext2,'.tsdf') == 1)
             newfilename = [filename newfileext];    
-        elseif (strcmp(ext2,'.mat') == 1),
+        elseif (strcmp(ext2,'.mat') == 1)
             newfilename = [filename newfileext];
-        elseif (strcmp(ext,'.mat') == 1),
+        elseif (strcmp(ext,'.mat') == 1)
             newfilename = [filename newfileext '.mat'];		% propose a new name     
         else
             newfilename = [filename newfileext '.tsdf'];		% propose a new name
@@ -140,18 +140,18 @@ if (isempty(files.tsdf))&(options.tsdfconly==0)&(isempty(files.mat)),
     end
 end
 
-if ~isempty(files.tsdf),
+if ~isempty(files.tsdf)
     newfilenames = files.tsdf;
-    if length(newfilenames) ~= length(TSindices),
+    if length(newfilenames) ~= length(TSindices)
         msgError('The number of filenames and the number of timeseries should be equal',5);
         return
     end    
 end
 
 
-if ~isempty(files.mat),
+if ~isempty(files.mat)
     newfilenames = files.mat;
-    if length(newfilenames) ~= length(TSindices),
+    if length(newfilenames) ~= length(TSindices)
         msgError('The number of filenames and the number of timeseries should be equal',5);
         return
     end    
@@ -163,11 +163,11 @@ end
 % Now start writing the files to disk
 % We are creating new files and no rewrites
 
-if options.tsdfconly == 0,
+if options.tsdfconly == 0
 
-    for p=1:length(TSindices),
+    for p=1:length(TSindices)
 
-        if ~isempty(files.tsdfc),
+        if ~isempty(files.tsdfc)
             tsdfcfilename = files.tsdfc{1};  % only one tsdfc file is supported
         else
             tsdfcfilename = [];
@@ -176,20 +176,20 @@ if options.tsdfconly == 0,
         newfilename = newfilenames{p};
         TSindex = TSindices(p);
 
-        if isempty(tsdfcfilename),
-            if isfield(TS{TSindex},'fids'),
-                if isfield(TS{TSindex},'tsdfcfilename'),
+        if isempty(tsdfcfilename)
+            if isfield(TS{TSindex},'fids')
+                if isfield(TS{TSindex},'tsdfcfilename')
                     tsdfcfilename = TS{TSindex}.tsdfcfilename;
                 else   
                     fprintf(1,'FIDUCIALS will not be written, no filename available');
                 end
-            elseif isfield(TS{TSindex},'tsdfcfilename'),
+            elseif isfield(TS{TSindex},'tsdfcfilename')
                 tsdfcfilename = TS{TSindex}.tsdfcfilename;
             end
         end        
     
-        if exist(newfilename,'file'),
-            if noprompt ~= 1,						% be careful altering these statements as they allow for overwriting files
+        if exist(newfilename,'file')
+            if noprompt ~= 1						% be careful altering these statements as they allow for overwriting files
                 question = sprintf('Do you want to replace: %s ?',newfilename);
                 result = utilQuestionYN(question);
             else
@@ -198,8 +198,8 @@ if options.tsdfconly == 0,
             if (result==1),
                 delete(newfilename);					% deletion is done here as the mex functions cannot replace files
                 [dummy,dummy2,ext] = fileparts(newfilename);
-                if strcmp(ext,'.mat') == 1,
-                    if options.scirunmat == 1,
+                if strcmp(ext,'.mat') == 1
+                    if options.scirunmat == 1
                         potvals = TS{TSindex}.potvals;
                         scirunWriteMatrix(newfilename,potvals);             % write a scirun file
                     else
@@ -221,8 +221,8 @@ if options.tsdfconly == 0,
             end
         else
             [dummy,dummy2,ext] = fileparts(newfilename);
-            if strcmp(ext,'.mat') == 1,
-                if options.scirunmat == 1,
+            if strcmp(ext,'.mat') == 1
+                if options.scirunmat == 1
                     potvals = TS{TSindex}.potvals;
                     scirunWriteMatrix(newfilename,potvals);             % write a scirun file
                 else
@@ -242,27 +242,27 @@ if options.tsdfconly == 0,
     end
 else    
 
-    for p=1:length(TSindices),
+    for p=1:length(TSindices)
 
         TSindex= TSindices(p);
     
 
-        if ~isempty(files.tsdfc),
+        if ~isempty(files.tsdfc)
             tsdfcfilename = files.tsdfc{1};  % only one tsdfc file is supported
         else
             tsdfcfilename = [];
         end
         
        
-       if isempty(tsdfcfilename),
-            if isfield(TS{TSindex},'fids'),
-                if isfield(TS{TSindex},'tsdfcfilename'),
+       if isempty(tsdfcfilename)
+            if isfield(TS{TSindex},'fids')
+                if isfield(TS{TSindex},'tsdfcfilename')
                     tsdfcfilename = TS{TSindex}.tsdfcfilename;
                 else   
                     fprintf(1,'FIDUCIALS will not be written, no filename available\n');    
                 end
                 
-            elseif isfield(TS{TSindex},'tsdfcfilename'),
+            elseif isfield(TS{TSindex},'tsdfcfilename')
                 tsdfcfilename = TS{TSindex}.tsdfcfilename;
             end
         end        
@@ -272,7 +272,7 @@ else
     
 end            
     
-if ~isempty(tsRecord),        % Clear the records once more
+if ~isempty(tsRecord)        % Clear the records once more
     tsClear(TSindices);
 end
 

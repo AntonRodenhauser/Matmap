@@ -1,4 +1,6 @@
 function result = tsIsBad(TimeSeriesNum,Lead)
+%returns result = find(bitand(TS{TimeSeriesNum}.leadinfo,1));  also alle
+%index wo leadinfo ist 1
 
 % FUNCTION result = tsIsBad(TSindex,lead)
 %

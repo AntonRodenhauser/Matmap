@@ -1,4 +1,6 @@
 function sigBaseLine(TSindices,blpts,blwin)
+%blpts are either blpts from ts.fids, if there are any, or else [startframe
+%endframe]
 
 % FUNCTION sigBaseLine(TSindices,baselinepoints,[baselinewindow])
 %

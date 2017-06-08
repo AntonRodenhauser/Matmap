@@ -17,19 +17,21 @@ function values = fidsFindLocalFids(TSindex,type,fidset)
 %
 % SEE ALSO fidsType
 
+
+%%%% deal with different inputs and load 'fids'
 fids = [];
 fidset = {};
 values = [];
-
-if iscell(TSindex),
+if iscell(TSindex)
     if length(TSindex) > 1, msgError('This function only works with one timeseries only',5); return; end
     TSindex = TSindex{1};
 end
 
-if isstruct(TSindex),
+if isstruct(TSindex)
     if isfield(TSindex,'fids'), fids  = TSindex.fids; end
     if isfield(TSindex,'fidset'), fidset = TSindex.fidset; end
 end
+
 
 if isnumeric(TSindex)
     global TS;
@@ -38,25 +40,32 @@ if isnumeric(TSindex)
     if isfield(TS{TSindex},'fidset'), fidset = TS{TSindex}.fidset; end
 end
 
-% Now print the fiducials
+%%%% fids is now ts.fids 
 
 if isempty(fids), return; end
 
+
+%%%%  make type the 'fids - number'
 if ischar(type), type = fidsType(type); end
+
+
+
 
 localf = [];
 
-for p=1:length(fids),
-    if (nargin == 3),
-        if ((fids(p).type ~= type)|(fids(p).fidset ~= fidset)),
+for p=1:length(fids)
+    if (nargin == 3)
+        if ((fids(p).type ~= type)||(fids(p).fidset ~= fidset))
             continue;
         end
     else
-        if (fids(p).type ~= type),
+        if (fids(p).type ~= type)
             continue;
         end
     end
-    if length(fids(p).value) ~= 1,
+    
+    
+    if length(fids(p).value) ~= 1
         localf(1:length(fids(p).value),end+1) = reshape(fids(p).value,length(fids(p).value),1);
     end
 end

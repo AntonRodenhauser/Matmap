@@ -809,6 +809,19 @@ function ZoomUp(handle)
     
 function ButtonDown(handle)
    	%callback for mouse click
+    
+   % - checks if right mouse click type (right click etc) is selected
+   % - checks if mouseclick is in winy/winx
+   %        - if yes: events=FindClosestEvents
+   %           - if event.sel(1)>1 (if erste oder zweite linie gewählt):
+   %               -yes: SetClosestEvent
+   %               - else: AddEvent
+   % - update the .EVENTS
+    
+    
+    
+    
+    
     global FIDSDISPLAY;
     
     seltype = get(gcbf,'SelectionType');   % double click, right click etc

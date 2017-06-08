@@ -1,4 +1,10 @@
 function tsDeal(TSindices,fieldname,contents)
+
+%sets TS{indices}.(fieldname)=contents     just ONE fieldname is given. if
+%dim(contents)=1, all TS get that value on field. If
+%dim(contents)=length(TSindices), then  TS{i}.(fieldname)=contents(i) for all i in 1:len(indices) 
+
+
 % FUNCTION tsDeal(TSindices,fieldname,contents)
 %
 % DESCRIPTION

@@ -39,14 +39,15 @@ function Navigation(handle,mode)
         set(handle,'DeleteFcn','');
         delete(handle);
     case {'apply'}
-        global myScriptData TS;
+        global TS;
         tsindex = myScriptData.CURRENTTS;
         if ~isfield(TS{tsindex},'selframes'),
             errordlg('No selection has been made; use the mouse to select a piece of signal');
         elseif isempty(TS{tsindex}.selframes),
             errordlg('No selection has been made; use the mouse to select a piece of signal');
         else
-            if DetectAlignment(handle) == 0, return; end
+    %        if DetectAlignment(handle) == 0, return; end        I turned
+    %        this of
             myScriptData.NAVIGATION = 'apply';
             set(handle,'DeleteFcn','');
             delete(handle);
@@ -58,7 +59,7 @@ function Navigation(handle,mode)
     return
 
 function SetupNavigationBar(handle)
-
+    % set up the navigation bar
     global myScriptData TS;
     tsindex = myScriptData.CURRENTTS;
     
@@ -74,60 +75,61 @@ function SetupNavigationBar(handle)
     end
     return
     
-function success = DetectAlignment(handle)
+% function success = DetectAlignment(handle)
+%     % what is this?
+%     global myScriptData SLICEDISPLAY TS;
+%     
+%     if ischar(myScriptData.ALIGNSTART),
+%         switch myScriptData.ALIGNMETHOD
+%             case 1,
+%                 % DO NOTHING
+%             case 2,
+%                 selframes = TS{myScriptData.CURRENTTS}.selframes;
+%                 if isfield(TS{myScriptData.CURRENTTS},'pacing'),
+%                     pacing = TS{myScriptData.CURRENTTS}.pacing;
+%                     [dummy,index] = min(abs(pacing-selframes(1)));
+%                     myScriptData.ALIGNSTART = -pacing(index(1)) + selframes(1);
+%                 end
+%             case 3,
+%                 DetectAlignmentRMS;
+%                 selframes = TS{myScriptData.CURRENTTS}.selframes;
+%                 pacing = SLICEDISPLAY.RMSPEAKS;
+%                 if ~isempty(pacing)
+%                     [dummy,index] = min(abs(pacing-selframes(1)));
+%                     myScriptData.ALIGNSTART = -pacing(index(1)) + selframes(1);
+%                 end
+%             case 4,
+%                 success = 1;
+%                 if ~isfield(TS{myScriptData.CURRENTTS},'templateframe'), success = 0;
+%                 elseif isempty(TS{myScriptData.CURRENTTS}.templateframe), success = 0; end
+%                 if success == 0,
+%                     errordlg('You need to specify a template for alignment','AUTOMATIC ALIGNMENT');
+%                    return;    
+%                 end
+%                 DetectAlignmentRMStemplate(2);
+%                 selframes = TS{myScriptData.CURRENTTS}.selframes;
+%                 pacing = SLICEDISPLAY.RMSPEAKS;
+%                 if ~isempty(pacing),
+%                     [dummy,index] = min(abs(pacing-selframes(1)));
+%                     myScriptData.ALIGNSTART = -pacing(index(1)) + selframes(1);
+%                end
+%         end
+%     end
+% 
+%     if ischar(myScriptData.ALIGNSIZE),
+%         switch myScriptData.ALIGNMETHOD
+%             case 1,
+%                 % DO NOTHING
+%             otherwise
+%                 selframes = TS{myScriptData.CURRENTTS}.selframes;
+%                 myScriptData.ALIGNSIZE = selframes(2)-selframes(1);
+%         end
+%     end
+% 
+%     success = 1;
+%     
+%     return
     
-    global myScriptData SLICEDISPLAY TS;
-    
-    if ischar(myScriptData.ALIGNSTART),
-        switch myScriptData.ALIGNMETHOD
-            case 1,
-                % DO NOTHING
-            case 2,
-                selframes = TS{myScriptData.CURRENTTS}.selframes;
-                if isfield(TS{myScriptData.CURRENTTS},'pacing'),
-                    pacing = TS{myScriptData.CURRENTTS}.pacing;
-                    [dummy,index] = min(abs(pacing-selframes(1)));
-                    myScriptData.ALIGNSTART = -pacing(index(1)) + selframes(1);
-                end
-            case 3,
-                DetectAlignmentRMS;
-                selframes = TS{myScriptData.CURRENTTS}.selframes;
-                pacing = SLICEDISPLAY.RMSPEAKS;
-                if ~isempty(pacing)
-                    [dummy,index] = min(abs(pacing-selframes(1)));
-                    myScriptData.ALIGNSTART = -pacing(index(1)) + selframes(1);
-                end
-            case 4,
-                success = 1;
-                if ~isfield(TS{myScriptData.CURRENTTS},'templateframe'), success = 0;
-                elseif isempty(TS{myScriptData.CURRENTTS}.templateframe), success = 0; end
-                if success == 0,
-                    errordlg('You need to specify a template for alignment','AUTOMATIC ALIGNMENT');
-                   return;    
-                end
-                DetectAlignmentRMStemplate(2);
-                selframes = TS{myScriptData.CURRENTTS}.selframes;
-                pacing = SLICEDISPLAY.RMSPEAKS;
-                if ~isempty(pacing),
-                    [dummy,index] = min(abs(pacing-selframes(1)));
-                    myScriptData.ALIGNSTART = -pacing(index(1)) + selframes(1);
-               end
-        end
-    end
-
-    if ischar(myScriptData.ALIGNSIZE),
-        switch myScriptData.ALIGNMETHOD
-            case 1,
-                % DO NOTHING
-            otherwise
-                selframes = TS{myScriptData.CURRENTTS}.selframes;
-                myScriptData.ALIGNSIZE = selframes(2)-selframes(1);
-        end
-    end
-
-    success = 1;
-    
-    return
     
 function handle = Init(tsindex)
 
@@ -136,10 +138,10 @@ function handle = Init(tsindex)
         myScriptData.CURRENTTS = tsindex;
     end
 
-    handle = winSliceDisplay;
+    handle = winMySliceDisplay;
     InitDisplayButtons(handle);
-    InitAlignButtons(handle);
-    InitAverageButtons(handle);
+%    InitAlignButtons(handle);
+%    InitAverageButtons(handle);
     InitMouseFunctions(handle);
     
     SetupNavigationBar(handle);
@@ -173,9 +175,11 @@ function InitMouseFunctions(handle)
     SLICEDISPLAY.ZOOMBOX =[];
     SLICEDISPLAY.P1 = [];
     SLICEDISPLAY.P2 = [];
-    set(handle,'WindowButtonDownFcn','SliceDisplay(''ButtonDown'',gcbf)',...
-               'WindowButtonMotionFcn','SliceDisplay(''ButtonMotion'',gcbf)',...
-               'WindowButtonUpFcn','SliceDisplay(''ButtonUp'',gcbf)','KeyPressFcn','SliceDisplay(''KeyPress'',gcbf)','interruptible','off');
+    set(handle,'WindowButtonDownFcn','mySliceDisplay(''ButtonDown'',gcbf)',...
+               'WindowButtonMotionFcn','mySliceDisplay(''ButtonMotion'',gcbf)',...
+               'WindowButtonUpFcn','mySliceDisplay(''ButtonUp'',gcbf)',...
+               'KeyPressFcn','mySliceDisplay(''KeyPress'',gcbf)',...
+               'interruptible','off');
     return
            
     
@@ -275,7 +279,7 @@ function InitAlignButtons(handle),
     
 function InitAverageButtons(handle),
 
-    global myScriptData SLICEDISPLAY TS;
+    global myScriptData TS;
 
     button = findobj(allchild(handle),'tag','AVERAGEMAXN');
     set(button,'string',num2str(myScriptData.AVERAGEMAXN)); 
@@ -664,7 +668,7 @@ function SetupDisplay(handle)
     if (isnumeric(myScriptData.ALIGNSTART) & (myScriptData.ALIGNSTARTENABLE == 1)),
         if myScriptData.ALIGNMETHOD  > 1,
             switch myScriptData.ALIGNMETHOD,
-                case 3,
+                case 3
                     DetectAlignmentRMS;
                 case 4,
                     DetectAlignmentRMStemplate(1);
@@ -888,7 +892,7 @@ function ZoomDown(handle)
         SLICEDISPLAY.P1 = P1;
         SLICEDISPLAY.P2 = P2;
         X = [ P1(1) P2(1) P2(1) P1(1) P1(1) ]; Y = [ P1(2) P1(2) P2(2) P2(2) P1(2) ];
-   	    SLICEDISPLAY.ZOOMBOX = line('parent',SLICEDISPLAY.AXES,'XData',X,'YData',Y,'Erasemode','xor','Color','k','HitTest','Off');
+   	    SLICEDISPLAY.ZOOMBOX = line('parent',SLICEDISPLAY.AXES,'XData',X,'YData',Y,'FaceAlpha', 0.4,'Color','k','HitTest','Off');
    	    drawnow;
     else
         xlim = SLICEDISPLAY.XLIM; ylim = SLICEDISPLAY.YLIM;
@@ -970,8 +974,18 @@ function  DeactivateAverage(handle,t)
     
     return    
     
-function ButtonDown(handle)
-   	
+function ButtonDown(handle)   
+   %callback for mouse click 
+   % - checks if right mouse click type (right click etc) is selected
+   % - checks if mouseclick is in winy/winx
+   %        - if yes: events=FindClosestEvents
+   %           - if event.sel(1)>1 (if erste oder zweite linie gewählt):
+   %               -yes: SetClosestEvent
+   %               - else: AddEvent
+   % - update the .EVENTS
+    
+    
+    
     global SLICEDISPLAY;
     
     seltype = get(gcbf,'SelectionType');
@@ -984,6 +998,8 @@ function ButtonDown(handle)
          DeactivateAverage(handle,t);
         return
     end
+    
+    
     
     events = SLICEDISPLAY.EVENTS{SLICEDISPLAY.SELEVENTS}; 
     
@@ -1018,7 +1034,17 @@ function ButtonMotion(handle)
     return
     
 function ButtonUp(handle)
+   % - events=EVENT{SD.SELEVENTS}
+   % - if events.selected > 0:
+   %        - get currentpoint -> setClosestEvent(events,t), set events.selected = 0
+   %        - AlignEvents???
+   %        - set ts.selframes (or templateframes r averageframes,
+   %        depending on SD.SELEVENTS)
+   % -drawnow
    
+    
+    
+    
     global SLICEDISPLAY TS myScriptData;
 
     events = SLICEDISPLAY.EVENTS{SLICEDISPLAY.SELEVENTS};  
@@ -1027,15 +1053,15 @@ function ButtonUp(handle)
 	    t = median([SLICEDISPLAY.XLIM point(1,1)]);
         events = SetClosestEvent(events,t); 
         events.selected = 0;
-        events = AlignEvents(events);
+ %       events = AlignEvents(events);
         
         SLICEDISPLAY.EVENTS{SLICEDISPLAY.SELEVENTS} = events;
-        switch  SLICEDISPLAY.SELEVENTS,
-            case 1,
+        switch  SLICEDISPLAY.SELEVENTS
+            case 1
                 TS{myScriptData.CURRENTTS}.selframes = sort(round(events.timepos*1000)); 
-            case 2,
+            case 2
                 TS{myScriptData.CURRENTTS}.templateframes = sort(round(events.timepos*1000));
-            case 3,
+            case 3
                 TS{myScriptData.CURRENTTS}.averageframes = sort(round(events.timepos*1000));
         end
     end
@@ -1081,7 +1107,7 @@ function events = SetClosestEvent(events,t)
 return
 
 function events = AlignEvents(events)
-
+% unimportant?! since I dont Align?
     global SLICEDISPLAY myScriptData;
     if SLICEDISPLAY.SELEVENTS > 1, return; end
     
@@ -1262,7 +1288,7 @@ function events = AddEvent(events,t)
 
   if isempty(events.timepos)  
     ypos = events.ylim;
-    events.box = patch('parent',events.axes,'XData',[t(1) t(1) t(2) t(2)],'YData',[ypos(1) ypos(2) ypos(2) ypos(1)],'EraseMode','xor','FaceColor',events.color);
+    events.box = patch('parent',events.axes,'XData',[t(1) t(1) t(2) t(2)],'YData',[ypos(1) ypos(2) ypos(2) ypos(1)],'FaceAlpha', 0.4,'FaceColor',events.color);
     events.timepos = t; 
     % drawnow;
   else
