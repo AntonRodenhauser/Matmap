@@ -37,7 +37,7 @@ global TS;
 ac2filename = files.ac2{1};
 TSindices = [];
 
-if isempty(ac2filename),
+if isempty(ac2filename)
     msgError('No AC2-file specified',3);
     return;
 end    
@@ -101,8 +101,9 @@ data = struct('filename', '' , ...
      
      %Read the raw data in to a matrix 
      fseek(file, 1024, 'bof');
-     pv = fread(file, numleads*numframes,'uint16=>uint16');
-     rawval = reshape(pv, numleads, numframes);
+     rawval = fread(file,[numleads,numframes],'uint16=>uint16');
+     
+
      
      
      %Test #2 if the first channel of each mux has the most 
@@ -110,7 +111,19 @@ data = struct('filename', '' , ...
      %sig_bit = bitshift(rawval, -15);
      
      %Extract gain and potential information from the raw data
-     gaininfo = bitand(bitshift(rawval,-12),uint16(7));
+     
+     
+     
+     bs=bitshift(rawval,-12);
+    
+     ui=uint16(7);
+     
+     gaininfo = bitand(bs,ui);
+     
+     
+     
+     
+     %gaininfo = bitand(bitshift(rawval,-12),uint16(7));
      potval  = double(bitand(rawval,uint16(4095))) - 2048;
      
     

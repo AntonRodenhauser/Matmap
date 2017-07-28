@@ -33,11 +33,11 @@ function tsDeal(TSindices,fieldname,contents)
 
 global TS;
 
-if ~iscell(contents),
+if ~iscell(contents)
     contents = {[contents]};
 end
 
-if (length(TSindices)~=length(contents))&(length(contents)~=1),
+if (length(TSindices)~=length(contents))&&(length(contents)~=1)
     msgError('contents needs to be of the same dimension as the TSindices',5);
 end
     
@@ -45,12 +45,12 @@ end
 % otherwise set the fields one to one
 
 q = 1;
-for p = TSindices,
-   if p <= length(TS),
-      if length(contents)> 1,
-         TS{p} = setfield(TS{p},fieldname,contents{q});
+for p = TSindices
+   if p <= length(TS)
+      if length(contents)> 1
+         TS{p}.(fieldname)=contents{q};
       else
-         TS{p} = setfield(TS{p},fieldname,contents{1});
+         TS{p}.(fieldname)=contents{1};
       end
    end
    q = q+ 1;

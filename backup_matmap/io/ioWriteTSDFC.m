@@ -25,22 +25,22 @@ global TS;
 % by this function as well. So the only thing to do here is to verify
 % whether there are fiducials and get them from the global.
 
-if nargin ~= 3,
+if nargin ~= 3
     msgError('Three inputs are required',3);
     return
 end    
 
-if isempty(tsdfcfile),
+if isempty(tsdfcfile)
     return;
 end
 
-if isempty(key),
+if isempty(key)
     return;
 end    
 
-if isfield(TS{TSindex},'fids'),
+if isfield(TS{TSindex},'fids')
     fids = TS{TSindex}.fids;
-    if isfield(TS{TSindex},'fidset'),
+    if isfield(TS{TSindex},'fidset')
         fidset = TS{TSindex}.fidset;
     else
         fidset = {};

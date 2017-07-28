@@ -276,14 +276,14 @@ if (~isempty(files.ac2)),
       % these empty slots
 
       ac2file = files.ac2{p};
-      if options.skiptsdffile,
+      if options.skiptsdffile
           index = tsNew(1);						% create an empty array
           tsSet(index,'filename',ac2file);				% just put in the filenames
       else
           addaudit = sprintf('|ac2file=%s',ac2file);  
           newoptions = options;
-          if ~isempty(files.mapping),
-             if length(files.mapping) > 1,
+          if ~isempty(files.mapping)
+             if length(files.mapping) > 1
 	         msgError('Currently only one mapping file per run is supported',2);
              end
              mapfile = files.mapping{1};
@@ -291,16 +291,16 @@ if (~isempty(files.ac2)),
              addaudit = [addaudit sprintf('|mappingfile=%s',mapfile)];
           end
    
-          if ~isempty(files.cal),
-             if length(files.cal) > 1,
+          if ~isempty(files.cal)
+             if length(files.cal) > 1
                  msgError('Currently only one cal file per run is supported',2);
              end
              calfile = files.cal{1};
              newoptions.scalemap = ioReadCal(calfile);
              addaudit = [addaudit sprintf('|calfile=%s',calfile)];
           end    
-          if ~isempty(files.cal8),
-             if length(files.cal8) > 1,
+          if ~isempty(files.cal8)
+             if length(files.cal8) > 1
                  msgError('Currently only one cal8 file per run is supported',2);
              end
              calfile = files.cal8{1};
@@ -308,19 +308,19 @@ if (~isempty(files.ac2)),
              addaudit = [addaudit sprintf('|cal8file=%s',calfile)];
           end
                     
-          if ~isempty(files.acqcal),
-             if length(files.acqcal) > 1,
+          if ~isempty(files.acqcal)
+             if length(files.acqcal) > 1
                  msgError('Currently only one acqcal file per run is supported',2);
              end
              calfile = files.calacq{1};
              newoptions.scalemap = ioReadCal8(calfile);
-             if ~isempty(files.mapping),
+             if ~isempty(files.mapping)
                  leadmap = newoptions.leadmap;
                  newoptions = rmfield(newoptions,'leadmap');
              end    
              index = ioiReadACQ(acqfile,newoptions);
              TS{index}.audit = [TS{index}.audit addaudit];
-             if ~isempty(files.mapping),
+             if ~isempty(files.mapping)
                 TS{index}.potvals = TS{index}.potvals(leadmap,:);
                 TS{index}.leadinfo = TS{index}.leadinfo(leadmap);
                 TS{index}.gain = TS{index}.gain(leadmap);
@@ -340,12 +340,12 @@ end
 
 
 
-if (isempty(files.tsdf)& isempty(files.tsdfc)& isempty(files.acq)& isempty(files.ac2)&isempty(files.mat)),
+if (isempty(files.tsdf)& isempty(files.tsdfc)& isempty(files.acq)& isempty(files.ac2)&isempty(files.mat))
    msgError('You should specify a filename with a timeseries',1);
 end
    
       
-if ~isempty(files.geom),
+if ~isempty(files.geom)
 
     geomindices = ioReadGEOM(files.geom);
     tsSet(TSindices,'geom',geomindices);                % link geometry with timeseries

@@ -28,14 +28,15 @@ function myProcessingScript(varargin)
     
     main_handle=mainMenu();            % open the figure
     myUpdateFigure(main_handle);      % and update it 
+    setHelpMenus(main_handle)      % and set help buttons
     
     setting_handle=SettingsDisplay();    %Open the settings Display
     myUpdateFigure(setting_handle);     % and update it
+    setHelpMenus(setting_handle);      
     
     myUpdateGroups        % analogous to UpdateGroups  (initialize Group Buttons)
     
-    myUpdateACQFiles      % get ACQ Files from input dir to display analog to UpdateACQFiles and get ACQ LABELS
-     
+    myUpdateACQFiles      % get ACQ Files from input directory to display them and get ACQ LABELS.
 end
 
 
@@ -51,132 +52,18 @@ function initMyScriptData()
     %       -> if no: save myScriptData as myScriptData.mat in current
     %       directory
     
-    
-    defaultsettings = { 'PWD','','file',...
-                    'MAPPINGFILE','','file', ...
-                    'PACINGLEAD',[],'double', ...
-                    'CALIBRATIONFILE','','file', ...
-                    'CALIBRATIONACQ','','vector', ...
-                    'CALIBRATIONACQUSED','','vector',...
-                    'CALIBRATIONMAPPINGUSED','','file',...
-                    'SCRIPTFILE','myScriptData.mat','file',...
-                    'ACQLABEL','','string',...
-                    'ACQLISTBOX','','listbox',...
-                    'ACQFILES',[],'listboxedit',...
-                    'ACQPATTERN','','string',...
-                    'ACQFILENUMBER',[],'vector',...
-                    'ACQINFO',{},'string',...
-                    'ACQFILENAME',{},'string',...
-                    'ACQNUM',0,'integer',...
-                    'DATAFILE','myProcessingData.mat','file',...
-                    'TSDFDIR','autoprocessing','file',...
-                    'ACQDIR','','file',...
-                    'ACQCONTAIN','','string',...
-                    'ACQCONTAINNOT','','string',...
-                    'ACQEXT','.acq,.ac2','string',...   % was tag for fileextension. I dont use it.. TODO
-                    'BASELINEWIDTH',5,'integer',...
-                    'GROUPNAME','GROUP','groupstring',... 
-                    'GROUPLEADS',[],'groupvector',...
-                    'GROUPEXTENSION','-ext','groupstring',...
-                    'GROUPTSDFC','group.tsdfc','groupfile',...
-                    'GROUPGEOM','','groupfile',...
-                    'GROUPCHANNELS','','groupfile',...
-                    'GROUPBADLEADSFILE','','groupfile',...
-                    'GROUPBADLEADS',[],'groupvector',...
-                    'GROUPDONOTPROCESS',0,'groupbool',...
-                    'GROUPDONOTDISPLAY',0,'groupbool',...
-                    'GROUPSELECT',0,'select',...
-                    'DO_CALIBRATE',1,'bool',...
-                    'DO_BLANKBADLEADS',1,'bool',...
-                    'DO_SLICE',1,'bool',...
-                    'DO_SLICE_USER',1,'bool',...
-                    'DO_ADDBADLEADS',0,'bool',...
-                    'DO_SPLIT',1,'bool',...
-                    'DO_BASELINE',1,'bool',...
-                    'DO_BASELINE_RMS',0,'bool',...
-                    'DO_BASELINE_USER',1,'bool',...
-                    'DO_DELTAFOVERF',0,'bool',...
-                    'DO_DETECT',1,'bool',...
-                    'DO_DETECT_USER',1,'bool',...
-                    'DO_DETECT_LOADTSDFC',1,'bool',...
-                    'DO_DETECT_AUTO',1,'bool',...
-                    'DO_DETECT_PACING',1,'bool',...
-                    'DO_LAPLACIAN_INTERPOLATE',1,'bool',...
-                    'DO_INTERPOLATE',0,'bool',...
-                    'DO_INTEGRALMAPS',1,'bool',...
-                    'DO_ACTIVATION',0,'bool',...
-                    'DO_ACTIVATIONMAPS',1,'bool',...
-                    'DO_FILTER',0,'bool',...
-                    'NAVIGATION','apply','string',...
-                    'DISPLAYTYPE',1,'integer',...
-                    'DISPLAYTYPEF',1,'integer',...
-                    'DISPLAYSCALING',1,'integer',...
-                    'DISPLAYSCALINGF',1,'integer',...
-                    'DISPLAYOFFSET',1,'integer',...
-                    'DISPLAYGRID',1,'integer',...
-                    'DISPLAYGRIDF',1,'integer',...
-                    'DISPLAYLABEL',1,'integer',...
-                    'DISPLAYLABELF',1,'integer',...
-                    'DISPLAYTYPEF1',1,'integer',...
-                    'DISPLAYTYPEF2',1,'integer',...
-                    'DISPLAYPACING',1,'integer',...
-                    'DISPLAYPACINGF',1,'integer',...
-                    'DISPLAYGROUP',1,'vector',...
-                    'DISPLAYGROUPF',1,'vector',...
-                    'DISPLAYSCALE',1,'integer',...
-                    'CURRENTTS',1,'integer',...
-                    'ALIGNSTART','detect','integer',...
-                    'ALIGNSIZE','detect','integer',...
-                    'ALIGNMETHOD',1,'integer',...
-                    'ALIGNSTARTENABLE',1,'integer',...
-                    'ALIGNSIZEENABLE',1,'integer',...
-                    'ALIGNRMSTYPE',1,'integer',...
-                    'ALIGNTHRESHOLD',0.9,'double',...
-                    'AVERAGEMETHOD',1,'integer',...
-                    'AVERAGERMSTYPE',1,'integer',...
-                    'AVERAGECHANNEL',1,'integer',...
-                    'AVERAGEMAXN',5,'integer',...
-                    'AVERAGEMAXRE',0.1,'double',...
-                    'KEEPBADLEADS',1,'integer',...
-                    'FIDSLOOPFIDS',1,'integer',...
-                    'FIDSAUTOACT',1,'integer',...
-                    'FIDSAUTOREC',1,'integer',...
-                    'FIDSAUTOPEAK',1,'integer',...
-                    'FIDSACTREV',0,'integer',...
-                    'FIDSRECREV',0,'integer',...
-                    'TSDFODIR','tsdf','string',...
-                    'TSDFODIRON',1,'bool',...
-                    'MATODIR','mat','string',...
-                    'MATODIRON',1,'bool',...      %kann weg
-                    'SCIMATODIR','scimat','string',...
-                    'SCIMATODIRON',0,'bool',...
-                    'ACTWIN',7,'integer',...
-                    'ACTDEG',3,'integer',...
-                    'ACTNEG',1,'integer',...
-                    'RECWIN',7,'integer',...
-                    'RECDEG',3,'integer',...
-                    'RECNEG',0,'integer',...
-                    'ALEADNUM',1,'integer',...
-                    'ADOFFSET',0.2,'double',...
-                    'ADISPLAYTYPE',1,'integer',...
-                    'ADISPLAYOFFSET',1,'integer',...
-                    'ADISPLAYGRID',1,'integer',...
-                    'ADISPLAYGROUP',1,'vector',...
-                    'OPTICALLABEL','','string',...
-                    'FILTERFILE','','string',...
-                    'FILTERNAME','NONE','string',...
-                    'FILTERNAMES',{'NONE'},'string',...
-                    'FILTER',[],'string',...
-                    'INPUTTSDFC','','string'
-            };
+
     global myScriptData;
 
     myScriptData = struct();
     myScriptData.TYPE = struct();
     myScriptData.DEFAULT = struct();
+    
+    
+    defaultsettings=getDefaultSettings;
 
     for p=1:3:length(defaultsettings)
-        if strncmp(defaultsettings{p+2},'group',5)
+        if strncmp(defaultsettings{p+2},'group',5) || strncmp(defaultsettings{p+2},'rungroup',8)
             myScriptData.(defaultsettings{p})={};
         else
             myScriptData.(defaultsettings{p})=defaultsettings{p+1};
@@ -190,6 +77,7 @@ function initMyScriptData()
     
     if exist(fullfile(pwd,myScriptData.SCRIPTFILE), 'file')==2
         load(fullfile(pwd,myScriptData.SCRIPTFILE));
+        old2newMyScriptData();
     else
         save('myScriptData','myScriptData');
     end
@@ -212,16 +100,12 @@ function initMyProcessingData()
         myProcessingData.FILENAME={};
         save(myScriptData.DATAFILE,'myProcessingData')
     end
-    
-    
 end
 
 function loadMyProcessingData()
     % just load myProcessingData from a mat file. Thus the
     % old myProcessingData is overwritten
-    
-    
-    global myScriptData myProcessingData; 
+    global myScriptData; 
     load(myScriptData.DATAFILE,'-mat');
 end
 
@@ -261,8 +145,7 @@ function ExportUserSettings(filename,index,fields)
             myProcessingData.(fields{p})=data;
         end
     end
-    saveMyProcessingData;
-    
+    saveMyProcessingData; 
 end
 
 function ImportUserSettings(filename,index,fields)
@@ -290,7 +173,6 @@ end
 
 function saveMyProcessingData()
 % analogous to function SaveScriptData
-% 
 
     global myScriptData myProcessingData;
     
@@ -302,9 +184,8 @@ function myUpdateFigure(handle)
 % changes all Settings in the figure ( that belongs to handle) according to
 % myScriptData.  
 %Updates everything, including File Listbox etc..
-
-    global myScriptData;
     
+    global myScriptData;
     if isempty(myScriptData)
         initMyScriptData;    
     end
@@ -329,20 +210,32 @@ function myUpdateFigure(handle)
                     set(obj,'string',mynum2str(myScriptData.(fn{p})));
                 case {'bool'}
                     set(obj,'value',myScriptData.(fn{p}));
-                case {'select'}   % case of dropdown menu to choose groups,  msd.GROUPSELECT
-                    value = myScriptData.(fn{p});    % which group is selected
-                    if value == 0, value = 1; end
+                case {'select'}   % case of msd.GROUPSELECT  
+                    value = myScriptData.(fn{p});    % int telling which group is selected
+                    if value == 0, value = 1; end  %if nothing was selected
                     set(obj,'value',value);
-                    selectnames = myScriptData.GROUPNAME;
+                    rungroup=myScriptData.RUNGROUPSELECT;
+                    if rungroup==0, continue; end
+                    selectnames = myScriptData.GROUPNAME{rungroup};  %update dropdown with GROUPNAME, but add 'NEW GROUP' first
                     selectnames{end+1} = 'NEW GROUP';
                     set(obj,'string',selectnames);
-                case {'groupfile','groupstring','groupdouble','groupvector','groupbool'}
+                    
+                case {'selectR'}
+                    value = myScriptData.(fn{p});    % int telling which rungroup is selected
+                    if value == 0, value = 1; end  %if nothing was selected
+                    selectrnames = myScriptData.RUNGROUPNAMES;  %update dropdown with GROUPNAME, but add 'NEW GROUP' first
+                    selectrnames{end+1} = 'NEW RUNGROUP'; 
+                    set(obj,'string',selectrnames);
+                    set(obj,'value',value);
+                    
+                    
+                case {'groupfile','groupstring','groupdouble','groupvector','groupbool'}   
                     group = myScriptData.GROUPSELECT;
                     if (group > 0)
                         set(obj,'enable','on','visible','on');
-                        cellarray = myScriptData.(fn{p});
-                        if length(cellarray) < group
-                            cellarray{group} = myScriptData.DEFAULT.(fn{p});
+                        cellarray = myScriptData.(fn{p}){myScriptData.RUNGROUPSELECT};
+                        if length(cellarray) < group   %if the 'new group' option is selected!
+                            cellarray{group} = myScriptData.DEFAULT.(fn{p});      % if new group was added, fill emty array slots with default values
                         end
                         switch objtype(6:end)
                             case {'file','string'}
@@ -352,9 +245,31 @@ function myUpdateFigure(handle)
                             case {'bool'}
                                 set(obj,'value',cellarray{group});
                         end
+                        myScriptData.(fn{p}){myScriptData.RUNGROUPSELECT}=cellarray;    
+                    else
+                        set(obj,'enable','inactive','visible','off');
+                    end
+                case {'rungroupstring', 'rungroupvector'}    %any of the rungroupbuttons
+                    rungroup = myScriptData.RUNGROUPSELECT;
+                    if (rungroup > 0)
+                        set(obj,'enable','on','visible','on');
+                        set(findobj(allchild(handle),'tag','GROUPSELECT'),'enable','on','visible','on')
+                        set(findobj(allchild(handle),'tag','RUNGROUPFILESBUTTON'),'enable','on','visible','on')
+                        
+                        cellarray = myScriptData.(fn{p});                     
+                        switch objtype(9:end)
+                            case {'file','string'}
+                                set(obj,'string',cellarray{rungroup});
+                            case {'double','vector','integer'}
+                                set(obj,'string',mynum2str(cellarray{rungroup}));
+                            case {'bool'}
+                                set(obj,'value',cellarray{rungroup});
+                        end
                         myScriptData.(fn{p})=cellarray;
                     else
                         set(obj,'enable','inactive','visible','off');
+                        set(findobj(allchild(handle),'tag','GROUPSELECT'),'enable','off','visible','off')
+                        set(findobj(allchild(handle),'tag','RUNGROUPFILESBUTTON'),'enable','off','visible','off')
                     end
             end
         end
@@ -362,28 +277,68 @@ function myUpdateFigure(handle)
 end
 
 
-function getAC2Labels()
+function getAC2Labels()  %TODO get rid of this stuff
 % get individual label of each .ac2 file in input folder and store them in
 % MSD.ACQLABEL, used for myProcessingData..
 % orignial doesnt work, it always asigns msd.ASQLABEL='' 
+% it should assign 'Run', (just takes the stuff from first file..)
+
+
+global myScriptData;
+myScriptData.ACQLABEL = 'Run';   %TODO..  leave this like that? ACQLABEL used in calfile stuff
+
+
+
+% olddir = pwd;
+% if ~isempty(myScriptData.ACQDIR)
+%     if exist(myScriptData.ACQDIR,'dir')
+%         cd(myScriptData.ACQDIR);
+%     end
+% end
+% 
+% d = dir('*.acq');
+% if isempty(d)
+%     d = dir('*.ac2');
+%     if isempty(d)
+%         cd(olddir); 
+%         return; 
+%     end
+% end
+% 
+% for p=1:length(d)
+%     t{p} = d(p).name(1:(strfind(d(p).name,'.')-1)); 
+% end
+% [B,I,J] = unique(t);
+% [dummy,I] = max(hist(J,1:length(B)));
+% 
+% label = t{I};
+% myScriptData.ACQLABEL = label;
+% 
+% label
+% cd(olddir);
+    
+
+
 end
 
 
 
 
-function myUpdateGroups()
+function myUpdateGroups()  %TODO get rid of this, pretty sure it's unneccesary
 % not entirely sure..  like UpdateGroups, 
 % sets default values for all the group cellarrays, if no values for a group have been set by the user
     global myScriptData;
-    len = length(myScriptData.GROUPNAME);
     fn = fieldnames(myScriptData.TYPE);
-    for p=1:length(fn)
-        if strncmp(myScriptData.TYPE.(fn{p}),'group',5)   % GROUPNAME, GROUPLEADS, GROUPEXTENSION, GROUPEXTENSION, GROUPBADLEADS etc.  
-            cellarray = myScriptData.(fn{p});
-            default = myScriptData.DEFAULT.(fn{p});
-            if length(cellarray) < len, cellarray{len} = default; end
-            for q=1:len
-                if isempty(cellarray{q}), cellarray{q} = default; end
+    for q=1:length(myScriptData.RUNGROUPNAMES)
+        len = length(myScriptData.GROUPNAME{q});
+        for p=1:length(fn)
+            if strncmp(myScriptData.TYPE.(fn{p}),'group',5)   % GROUPNAME, GROUPLEADS, GROUPEXTENSION, GROUPEXTENSION, GROUPBADLEADS etc.  
+                cellarray = myScriptData.(fn{p}){q};
+                default = myScriptData.DEFAULT.(fn{p});
+                if length(cellarray) < len, cellarray{len} = default; end
+                for s=1:len
+                    if isempty(cellarray{s}), cellarray{s} = default; end
+                end
             end
         end
     end
@@ -438,7 +393,7 @@ function GetACQFiles
     % filenames is cellarray with all the filenames of files in folder, like 
     %{'Ran0001.ac2'    'Ru0009.ac2'}
     
-    filenames = sort(filenames);   
+    filenames = sort(filenames);
     
     options.scantsdffile = 1;
    
@@ -453,25 +408,38 @@ function GetACQFiles
         return
     end
     
-    h = waitbar(0,'INDEXING AND READING FILES'); drawnow;
+    h = waitbar(0,'INDEXING AND READING FILES','Tag','waitbar'); drawnow;
     T = ioReadTSdata(filenames,options);    % read in all the file data in cellarray T
-    waitbar(0.8,h);
+    if isgraphics(h), waitbar(0.8,h); end
     
     for p = 1:length(T)
         if ~isfield(T{p},'time'), T{p}.time = 'none'; end
         if ~isfield(T{p},'label'), T{p}.label = 'no label'; end
         T{p}.label=myStrTrim(T{p}.label); %necessary, because original strings have weird whitespaces that are not recognized as whitespaces.. really weird!
-        myScriptData.ACQFILENUMBER(p) = p;
-        myScriptData.ACQLISTBOX{p} = sprintf('%04d %20s %15s %20s',myScriptData.ACQFILENUMBER(p),T{p}.filename,T{p}.time,T{p}.label);
+        myScriptData.ACQFILENUMBER(p) = p;      
+        
+        %%% find out which rungroup p belongs to
+        rungroup='';
+        for s=1:length(myScriptData.RUNGROUPNAMES)
+            if ismember(p, myScriptData.RUNGROUPFILES{s})
+                rungroup=myScriptData.RUNGROUPNAMES{s};
+                break
+            end
+        end
+        
+        T{p}.time=myStrTrim(T{p}.time);   % use of myStrTrim for the same reason as above..     
+        myScriptData.ACQLISTBOX{p} = sprintf('%04d %15s %15s %13s %20s',myScriptData.ACQFILENUMBER(p),T{p}.filename,rungroup, T{p}.time,T{p}.label);
+        
         myScriptData.ACQFILENAME{p} = T{p}.filename;
         myScriptData.ACQINFO{p} = T{p}.label;
     end
-    
+
     [~,~,myScriptData.ACQFILES] = intersect(oldfilenames,myScriptData.ACQFILENAME);
     myScriptData.ACQFILES = sort(myScriptData.ACQFILES);
     
-    waitbar(1,h); drawnow;
-    close(h);
+    if isgraphics(h), waitbar(1,h); end
+    drawnow;
+    if isgraphics(h), close(h); end
     
     cd(olddir);
 end
@@ -485,32 +453,37 @@ end
 
 function CloseFcn(~)
 %callback function for the 'close' buttons.
-disp('aja')
  saveSettings([])
  delete(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU')); 
  delete(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS')); 
  delete(findobj(allchild(0),'tag','SLICEDISPLAY'));
  delete(findobj(allchild(0),'tag','FIDSDISPLAY'));
+ close(findobj(allchild(0),'Tag','waitbar'))  %delete all waitbars
+ 
+ global myScriptData FIDSDISPLAY SLICEDISPLAY
+ clear myScriptdata FIDSDISPLAY SLICEDISPLAY
 end
-
-
 
 function Browse(handle,ext,mode)
 
     global myScriptData
-    if nargin == 1,
+    if nargin == 1
         ext = 'mat';
         mode = 'file';
     end
     
-    if nargin == 2,
+    if nargin == 2
         mode = 'file';
     end
     
     tag = get(handle,'tag');
     tag = tag(8:end);
     
-    filename = myScriptData.(tag);
+    if strcmp(tag,'RUNGROUPMAPPINGFILE')
+        filename = myScriptData.(tag){myScriptData.RUNGROUPSELECT};
+    else
+        filename = myScriptData.(tag);
+    end
     
     switch mode
         case 'file'
@@ -523,12 +496,14 @@ function Browse(handle,ext,mode)
             newFileString=pn;         
     end
     
+    
     switch tag
         case 'ACQDIR'
             myScriptData.(tag)=newFileString;
             myUpdateACQFiles(handle)
         case 'SCRIPTFILE'
             dealWithNewMyScriptData(newFileString);
+            myScriptData.(tag)=newFileString;
         case 'DATAFILE'
             if exist(newFileString,'file')
                 if isCorrectFile(newFileString,'myProcessingData')
@@ -540,12 +515,44 @@ function Browse(handle,ext,mode)
             else
                 save(newFileString,'myProcessingData')
             end
+            myScriptData.(tag)=newFileString;
+        case 'RUNGROUPMAPPINGFILE'
+           myScriptData.(tag){myScriptData.RUNGROUPSELECT}=newFileString; 
+        otherwise
+           myScriptData.(tag)=newFileString;
     end
-    myScriptData.(tag)=newFileString;
     parent = get(handle,'parent');
     myUpdateFigure(parent);
+end
+
+function selectRunGroupFiles(~)
+%callback function to 'select Rungroup files'
+
+selectRungroupFiles
+
+%%%% make sure each file is associated with only one rungroup
+global myScriptData
+rungroup=myScriptData.RUNGROUPSELECT;
+for s=1:length(myScriptData.RUNGROUPFILES{rungroup})
+    rgFileID=myScriptData.RUNGROUPFILES{rungroup}(s);
+    for t=1:length(myScriptData.RUNGROUPFILES)
+        if t== rungroup, continue, end
+        myScriptData.RUNGROUPFILES{t}=myScriptData.RUNGROUPFILES{t}(myScriptData.RUNGROUPFILES{t}~=rgFileID);
+    end
+end
+        
+        
+
+
+
+
+myUpdateACQFiles
+myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
+
 
 end
+
+
 
 
 function myUpdateACQFiles(~)
@@ -571,7 +578,6 @@ end
 
 
 function setScriptData(handle, mode)
-
 % callback function to almost all buttons
 
 % notes on how it works:
@@ -580,6 +586,20 @@ function setScriptData(handle, mode)
 % corresponding fiel in myScriptData.  To further differentiate how each
 % object is being dealt, the objecttype=myScriptData.TYPE.(tag) is used.
 
+    %%%% first, set the focus on some dummy uicontrol. This ensures that
+    % the hotkey 'spacebar' only affects the behaviour of the dummy
+    % controll. There are two dummy controlls: one in the Settings and one
+    % in the main menu (they are hidden underneath the pannels).
+    
+%     obj1=findobj(allchild(findobj(allchild(0),'Tag','PROCESSINGSCRIPTMENU')),'Tag','dummy');
+%     obj2=findobj(allchild(findobj(allchild(0),'Tag','PROCESSINGSCRIPTSETTINGS')),'Tag','dummy');
+%     if strcmp(handle.Parent.Tag,'PROCESSINGSCRIPTMENU')
+%         uicontrol(obj1);
+%     else
+%         uicontrol(obj2)
+%     end
+
+    
     global myScriptData myProcessingData;
     tag = get(handle,'tag'); 
     
@@ -599,19 +619,34 @@ function setScriptData(handle, mode)
             myScriptData.(tag)=get(handle,'value');
         case 'select'
             myScriptData.(tag)=get(handle,'value');
+        case 'selectR'
+            value=get(handle,'value');
+            myScriptData.(tag)=value;           
+            if length(myScriptData.RUNGROUPNAMES) < value  %if NEW RUNGROUP is selected, make all group cells longer
+                fn=fieldnames(myScriptData.TYPE);
+                for p=1:length(fn)
+                    if strncmp(myScriptData.TYPE.(fn{p}),'group',5)
+                        myScriptData.(fn{p}){end+1}={};
+                    end
+                    if strncmp(myScriptData.TYPE.(fn{p}),'rungroup',8)  %if NEW RUNGROUP is selected, make all rungroup cells one entry longer
+                        myScriptData.(fn{p}){end+1} = myScriptData.DEFAULT.(fn{p});
+                    end                     
+                end
+                myScriptData.GROUPSELECT=0;
+             end          
         case 'listbox'
             myScriptData.ACQFILES = myScriptData.ACQFILENUMBER(get(handle,'value'));
         case {'listboxedit'}
             myScriptData.(tag)=mystr2num(get(handle,'string'));
-        case {'groupfile','groupstring','groupdouble','groupvector','groupbool'}
-            group = myScriptData.GROUPSELECT;
+        case {'groupfile','groupstring','groupdouble','groupvector','groupbool'}      %if any of the groupstuff is changed
+            group = myScriptData.GROUPSELECT;      %integer, which group is selected in dropdown
             if (group > 0)
-                if isfield(myScriptData,tag)
-                    cellarray = myScriptData.(tag);
+                if isfield(myScriptData,tag)  %todor And if {runroupselect} exists
+                    cellarray = myScriptData.(tag){myScriptData.RUNGROUPSELECT};     % cellarray is eg {{'-gr1', '-gr2'}, .. } 
                 else
                     cellarray = {};
                 end
-                switch objtype(6:end)
+                switch objtype(6:end)     %change individual entry of cellarray according to user input. no change here necessary
                     case {'file','string'}
                         cellarray{group} = get(handle,'string');
                     case {'double','vector'}
@@ -619,9 +654,41 @@ function setScriptData(handle, mode)
                     case {'bool'}
                         cellarray{group} = get(handle,'value');
                 end
+                myScriptData.(tag){myScriptData.RUNGROUPSELECT}=cellarray;
+            end
+        case {'rungroupstring', 'rungroupvector'}  
+            rungroup=myScriptData.RUNGROUPSELECT;
+            if rungroup > 0
+                cellarray = myScriptData.(tag);     % cellarray is eg {{'-gr1', '-gr2'}, .. } 
+                
+                switch objtype(9:end)     %change individual entry of cellarray according to user input. 
+                    case {'file','string'}
+                        cellarray{rungroup} = get(handle,'string');
+                    case {'double','vector'}
+                        cellarray{rungroup} = mystr2num(get(handle,'string'));
+                    case {'bool'}
+                        cellarray{rungroup} = get(handle,'value');
+                end
                 myScriptData.(tag)=cellarray;
             end
+            myUpdateACQFiles;
+                
     end
+    
+    if strcmp(tag,'RUNGROUPFILES')
+        %make sure each file is only associated with one rungroup
+        rungroup=myScriptData.RUNGROUPSELECT;
+        for s=1:length(myScriptData.RUNGROUPFILES{rungroup})
+            rgFileID=myScriptData.RUNGROUPFILES{rungroup}(s);
+            for t=1:length(myScriptData.RUNGROUPFILES)
+                if t== rungroup, continue, end
+                myScriptData.RUNGROUPFILES{t}=myScriptData.RUNGROUPFILES{t}(myScriptData.RUNGROUPFILES{t}~=rgFileID);
+            end
+        end
+        myUpdateACQFiles(handle);
+    end
+    
+    
     if nargin == 2
         if strcmp(mode,'input')   %if call was by input bar
             getAC2Labels;   % upate msd.ACQLABEL
@@ -642,25 +709,12 @@ end
 function loadSettings(handle)
 % callback function to the 'load settings from file' button
 % - asks user for a myScriptData.mat file
-% - loads the data of the chosen myScriptData in the myScriptData struct
-% - uptdates all gui objects with data from myScriptData
-% - sets myScriptData.SCRIPTFILE to the full path of the chosen
-%    myScriptData.mat file
+% - calls dealWithNewScriptData, which does all the needed stuff
     
     global myScriptData;
     [filename,pathname] = uigetfile('*.mat','Choose myScriptData file');
     filename = fullfile(pathname,filename);
     dealWithNewMyScriptData(filename);
-    
-%     if exist(filename,'file')
-%         load(filename,'-mat');        
-%     end      
-%     myUpdateACQFiles(handle);
-%     myUpdateGroups;
-%     myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
-%     myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU'));
-%     
-%     myScriptData.SCRIPTFILE=filename;
 
 end 
 
@@ -684,19 +738,43 @@ function removeGroup(handle)
     if group > 0
        fn = fieldnames(myScriptData.TYPE);
        for p=1:length(fn)
-           if strncmp(fn{p},'GROUP',5)
-               cellarray = myScriptData.(fn{p});
-               ind = 1:length(cellarray);
-               ind = ind(find(ind ~= group));
-               cellarray = cellarray(ind);
-               myScriptData.(fn{p})=cellarray;
+           if strncmp(fn{p},'GROUP',5) && ~strcmp('GROUPSELECT',fn{p})
+               myScriptData.(fn{p}){myScriptData.RUNGROUPSELECT}(group)=[];
            end
        end
-       myScriptData.GROUPSELECT = 0;
+       myScriptData.GROUPSELECT =length(myScriptData.GROUPNAME{myScriptData.RUNGROUPSELECT});
    end
-   
    myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
 end
+
+
+function removeRunGroup(handle)
+%callback to 'remove this rungroup'
+    global myScriptData;
+    rungroup = myScriptData.RUNGROUPSELECT;
+    if rungroup > 0
+       fn = fieldnames(myScriptData.TYPE);
+       for p=1:length(fn)
+           if strncmp(fn{p},'RUNGROUP',8) && ~strcmp('RUNGROUPSELECT',fn{p})
+               myScriptData.(fn{p})(rungroup)=[];
+           end
+           if strncmp(fn{p},'GROUP',5) && ~strcmp('GROUPSELECT',fn{p})
+               myScriptData.(fn{p})(rungroup)=[];
+           end
+       end
+       myScriptData.RUNGROUPSELECT=length(myScriptData.RUNGROUPNAMES);
+       
+       rungroupselect=myScriptData.RUNGROUPSELECT;
+       if rungroupselect > 0
+            myScriptData.GROUPSELECT = length(myScriptData.GROUPNAME{rungroupselect});
+       else
+           myScriptData.GROUPSELECT = 0;
+       end
+ 
+   end
+   myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
+end
+
 
 function selectAllACQ(~)
 %callback function to "select all" button at file listbox
@@ -753,33 +831,49 @@ function runScript(handle)
 %   - at very end when everything is processed: update figure and groups
 %       
     global myScriptData
-
-    saveSettings(handle);
+    saveSettings();
     
     loadMyProcessingData;  
-    
+    saveSettings
     h = [];   %for waitbar
 %     olddir =pwd;      %why?     seems not important TODO
-%     cd(myScriptData.PWD);
-    
+%     cd(myScriptData.PWD); 
     PreLoopScript;
     saveSettings(handle);
 
-    if isempty(myScriptData.GROUPNAME)
-        errordlg('you need to define groups for processing the data');
-        return;
+    for s=1:length(myScriptData.RUNGROUPNAMES)
+        if isempty(myScriptData.GROUPNAME{s})
+            errordlg('you need to define groups for each defined rungroup in order to  process the data.');
+            error('There is at least one rungroup with no groups defined.')
+        end
     end
 
-    %% MAIN LOOP %%%
+    %%%% MAIN LOOP %%%
     acqfiles = unique(myScriptData.ACQFILES);
-    h  = waitbar(0,'SCRIPT PROGRESS'); drawnow;
+    h  = waitbar(0,'SCRIPT PROGRESS','Tag','waitbar'); drawnow;
 
     p = 1;
     while (p <= length(acqfiles))
 
-        myScriptData.ACQNUM = acqfiles(p);            
-        ProcessACQFile(myScriptData.ACQFILENAME{acqfiles(p)},myScriptData.ACQDIR);
+        myScriptData.ACQNUM = acqfiles(p);
+        
+        %%%% find the current rungroup of processed file
+        myScriptData.CURRENTRUNGROUP=[];
+        for s=1:length(myScriptData.RUNGROUPNAMES)
+            if ismember(acqfiles(p), myScriptData.RUNGROUPFILES{s})
+                myScriptData.CURRENTRUNGROUP=s;
+                break
+            end
+        end
+        if isempty(myScriptData.CURRENTRUNGROUP)
+            msg=sprintf('No Rungroup specified for %s. You need to specify a Rungroup for each file that you want to process.',myScriptData.ACQFILENAME{acqfiles(p)});
+            errordlg(msg);
+            error('No Rungroup specified for all files')
+        end
+            
 
+        ProcessACQFile(myScriptData.ACQFILENAME{acqfiles(p)},myScriptData.ACQDIR);
+        
         switch myScriptData.NAVIGATION
             case 'prev'
                 p = p-1; 
@@ -790,20 +884,29 @@ function runScript(handle)
             case 'stop'
                 break;
         end
-        waitbar(p/length(acqfiles),h);
+        if isgraphics(h), waitbar(p/length(acqfiles),h); end
         p = p+1;
     end
 
-    close(h);
-    
+    if isgraphics(h), close(h); end
     myUpdateGroups;
     myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
     myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU')); 
-    
-    disp('fertig')
 end
 
+function KeyPress(handle)
+    global myScriptData;
 
+    key = real(handle.CurrentCharacter);
+    
+    if isempty(key), return; end
+    if ~isnumeric(key), return; end
+
+    switch key(1) 
+        case 32    % spacebar
+%            runScript(handle);
+    end
+end
 
 %%%%%%%%%%%%%%script functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -811,7 +914,7 @@ end
 
 function PreLoopScript
     %this function is called right before main loop starts. Its jobs are: 
-%       - checks if mapfile etc exist (I do that already earlier?!)
+%       - checks if mapfile etc exist
 %       - generates a CALIBRATION file, if none is supplied but
 %       Do_Calibration is on
 %       - set up SCRIPT.GBADLEADS,  SCRIPT.MAXLEAD and mpd.LIBADLEADS
@@ -821,7 +924,7 @@ function PreLoopScript
     global myScriptData myProcessingData   
     myScriptData.ALIGNSTART = 'detect';
     myScriptData.ALIGNSIZE = 'detect';
-     
+    
     
     %%%% -create filenames, which holds all the filename-strings of only the files selected by user.  
     % -create index, which holds all the indexes of filenames, that contain '-acq' or '.ac2'
@@ -832,99 +935,101 @@ function PreLoopScript
     end   
     
     
+    %%%% check if input directory is provided and valid
+    if ~exist(myScriptData.MATODIR,'dir')
+        errordlg('Provided output directory does not exist.')
+        error('Invalid output directory')
+    end
+    
+    
     
     if ~isempty(index)
-        
-        %%%% check mapping file, eg for existes %%%%%%%%%%%%%%%%%%%%%% 
-        mappingfile = myScriptData.MAPPINGFILE;
-        if isempty(mappingfile)
-            % MAKE SURE mappingfile IS OF STRING TYPE
-            % THESE MAKES CODING DOWNSTREAM MORE EASY
-            mappingfile = '';
-        elseif ~exist(mappingfile,'file')
-            errordlg('The mapping file does not exist');
-            error('ERROR')
-        end  
-    
-    
-        
-        %%%%%%  start generating calibration file %%%%%%%%%%%%%%%
-        %% somehwhere here sigCalibrate8 is called
+        %%%%%%  generate a calibration file if neccessary %%%%%%%%%%%%%%%
         if myScriptData.DO_CALIBRATE == 1  % if 'calibrate Signall' button is on
-            
             %%% if no calibration file and no CALIBRATIONACQ is given: exit
             %%% and make error message
             if isempty(myScriptData.CALIBRATIONACQ) && isempty(myScriptData.CALIBRATIONFILE)
                 errordlg('Specify the filenumbers of the calibration measurements or a calibration file');
-                error('ERROR'); 
+                error('No ac2cal files or .cal8 file specified.'); 
             end   
 		    
-            %%% if cal is empty, initialise it as 'calibration.cal8'
-            if isempty(myScriptData.CALIBRATIONFILE)
-                myScriptData.CALIBRATIONFILE = 'calibration.cal8';
-            end
-            
-            
-            %%% if file ext is .'cal', change it to '.cal8'
-            calfile = myScriptData.CALIBRATIONFILE;
-            [pn,fn,ext] = fileparts(calfile); 
-            if (strcmp(ext,'.cal') ~= 1)
-                calfile = fullfile(pn,[fn '.cal8']);
-            end
-            
-            
-            %%% if calfile doesnt exist OR msd.MAPPINGFILE is not
-            %%% msd.CALIBRATIONMAPPINGUSED OR msd.CALIBRATIONACQ und
-            %%% CALIBRATIONACQUSED dont match exactly
-		    if ~isempty(myScriptData.CALIBRATIONACQ)
-			    if (~exist(calfile,'file')) || (strcmp(myScriptData.MAPPINGFILE,myScriptData.CALIBRATIONMAPPINGUSED) ~= 1) | ( ~isempty(setxor(myScriptData.CALIBRATIONACQ,myScriptData.CALIBRATIONACQUSED))), 
-				    %for comptability with either ac2 or acq files
-                    if ~isempty(strfind(myScriptData.ACQEXT,'.acq'))
-                    acqcalfiles = ioACQFilename(myScriptData.ACQLABEL,myScriptData.CALIBRATIONACQ);
-                    else
-                        acqcalfiles = ioAC2Filename(myScriptData.ACQLABEL,myScriptData.CALIBRATIONACQ);
+            %%%% create a calfile if DO_CALIBRATE is on, but no calfile is
+            %%%% given
+		    if isempty(myScriptData.CALIBRATIONFILE) && myScriptData.DO_CALIBRATE
+                    % generate a cell array of the .ac2 files used for
+                    % calibration
+                    acqcalfiles=myScriptData.ACQFILENAME(myScriptData.CALIBRATIONACQ);
+				    if ~iscell(acqcalfiles), acqcalfiles = {acqcalfiles}; end 
+                    
+                    %find the mappingfile used for the acqcalfiles.
+                    mappingfile=[];
+                    for s=1:length(myScriptData.RUNGROUPNAMES)
+                        if ismember(myScriptData.CALIBRATIONACQ,myScriptData.RUNGROUPFILES{s})
+                            mappingfile=myScriptData.RUNGROUPMAPPINGFILE{s};
+                            break
+                        end
+                    end
+                    if isempty(mappingfile)
+                        errordlg('matmap can only create a .cal8 file, if all files used for calibration belong to the same rungroup. However, this does not seem to be the case.');
+                        error('error creating the .cal8 file. Couldn''t figure out which mapping file to use..')
                     end
                     
-				    if ~iscell(acqcalfiles), acqcalfiles = {[acqcalfiles]}; end 
-				    for p=1:length(acqcalfiles), acqcalfiles{p} = fullfile(myScriptData.ACQDIR,acqcalfiles{p}); end
+                    
+				    for p=1:length(acqcalfiles)
+                        acqcalfiles{p} = fullfile(myScriptData.ACQDIR,acqcalfiles{p});
+                    end
+                    
 				    pointer = get(gcf,'pointer'); set(gcf,'pointer','watch');
+                    calfile='calibration.cal8';
 				    sigCalibrate8(acqcalfiles{:},mappingfile,calfile,'displaybar');
-				    set(gcf,'pointer',pointer);                    myScriptData.CALIBRATIONFILE = calfile;
-				    myScriptData.CALIBRATIONACQUSED = myScriptData.CALIBRATIONACQ;
-				    myScriptData.CALIBRATIONMAPPINGUSED = myScriptData.MAPPINGFILE;
-			    end
+				    set(gcf,'pointer',pointer);
+                    
+                    myScriptData.CALIBRATIONFILE = fullfile(pwd,calfile);
 		    end 
         end
-    end
-    %% end calibration file %%%
+    end    
     
-    
-    
-    %%%% RENDER A GLOBAL LIST OF ALL THE BADLEADS,  set msd.GBADLEADS%%%%  
-    for p=1:length(myScriptData.GROUPBADLEADS)
-        badleads = myScriptData.GROUPBADLEADS{p};
-        if ~isempty(myScriptData.GROUPBADLEADSFILE{p})
-            bfile = load(myScriptData.GROUPBADLEADSFILE{p},'-ASCII');
-            badleads = union(bfile(:)',badleads);
-        end
+    %%%% RENDER A GLOBAL LIST OF ALL THE BADLEADS,  set msd.GBADLEADS%%%%
+   
+   myScriptData.GBADLEADS={};
+   for s=1:length(myScriptData.RUNGROUPNAMES)
+       badleads=[];
+       for p=1:length(myScriptData.GROUPBADLEADS{s})           
+            reference=myScriptData.GROUPLEADS{s}{p}(1)-1;    
+            addBadleads=  myScriptData.GROUPBADLEADS{s}{p} + reference;
+            
+            % check if user input for badleads is correct
+            diff=myScriptData.GROUPLEADS{s}{p}(end)-myScriptData.GROUPLEADS{s}{p}(1);
+            if any(myScriptData.GROUPBADLEADS{s}{p} < 1) || any(myScriptData.GROUPBADLEADS{s}{p} > diff+1)
+                msg=sprintf('Bad leads for the group %s in the rungroup %s are invalid. Bad leads must be between 1 and ( 1 + maxGrouplead - minGrouplead).',myScriptData.GROUPNAME{s}{p}, myScriptData.RUNGROUPNAMES{s});
+                errordlg(msg);
+                error('specified bad leads are invalid')
+            end
+            
+
+            
+            % read in badleadsfile, if there is one
+            if ~isempty(myScriptData.GROUPBADLEADSFILE{s}{p}) %TODO, do I want to badleadsfile of this grouplisttype?
+                bfile = load(myScriptData.GROUPBADLEADSFILE{s}{p},'-ASCII');
+                badleads = union(bfile(:)',badleads);
+            end        
+       end
         
-        leads = myScriptData.GROUPLEADS{p};
-        ind = find((badleads>0)&(badleads<=length(leads)));
-        badleads = badleads(ind);
-        myScriptData.GBADLEADS{p} = badleads;
+        
+        myScriptData.GBADLEADS{s} = badleads;
+   end
+
+    
+    
+    %%%% FIND MAXIMUM LEAD for each rg
+    myScriptData.MAXLEAD={};  %set to empty first, just in case
+    for s=1:length(myScriptData.RUNGROUPNAMES)  
+        maxlead = 1;
+        for p=1:length(myScriptData.GROUPLEADS{s})
+            maxlead = max([maxlead myScriptData.GROUPLEADS{s}{p}]);  %TODO this can be done a lot easier..
+        end
+        myScriptData.MAXLEAD{s} = maxlead;
     end
-    % bad leads from badleadsfile now alsow used
-    % now GBADLEADS are only lead index between 1 and length(leads) (why?) 
-    % start counting at 1 for each group?!
-    
-    
-    %%%% FIND MAXIMUM LEAD
-    maxlead = 1;
-    for p=1:length(myScriptData.GROUPLEADS)
-        maxlead = max([maxlead myScriptData.GROUPLEADS{p}]);
-    end
-    myScriptData.MAXLEAD = maxlead;
-    
     
     
     
@@ -934,10 +1039,11 @@ function PreLoopScript
             errordlg('Need to split the signals before interpolation');
             error('ERROR');
         end
-        
-        for q=1:length(myScriptData.GROUPNAME)
-            myProcessingData.LIBADLEADS{q} = [];   % TRIGGER INITIATION
-            myProcessingData.LI{q} = [];
+        for s=1:length(myScriptData.RUNGROUPNAMES)  %a edit: for each rg..
+            for q=1:length(myScriptData.GROUPNAME{s})
+                myProcessingData.LIBADLEADS{s}{q} = [];   % TRIGGER INITIATION
+                myProcessingData.LI{s}{q} = [];
+            end
         end
     end
 end
@@ -963,8 +1069,7 @@ function ProcessACQFile(inputfilename,inputfiledir)
 %        -  does some upgrades to bad leads 
 %        -  ExportUserSettings
 %        - calls sigSlice, which in this case:  updates TS{currentIndex} bei
-%           keeping only the timeframe-window specified (does it change to
-%           local or global frame for fids?) 
+%           keeping only the timeframe-window specified
 % - Do 'blank leads', if that option is selected
 % - DO ALL THE BASELINE STUFF
 %       - shift fiducials to local frame (I think?!)
@@ -988,19 +1093,32 @@ function ProcessACQFile(inputfilename,inputfiledir)
 % - do integral maps, if selected and save them
 % - do Activation maps, if that option is selected
 
+    
+
 
     olddir = pwd;
     global myScriptData TS myProcessingData;
-    
 
 %%%%% create cellaray files={full acqfilename, mappingfile, calibration file}, if the latter two are needet & exist    
     filename = fullfile(inputfiledir,inputfilename);
-    [d1,d2,ext] = fileparts(inputfilename); 
     files{1} = filename;
-    if ~isempty(myScriptData.MAPPINGFILE)
-        files{end+1} = myScriptData.MAPPINGFILE;
-    end
-    if myScriptData.DO_CALIBRATE == 1
+    isMatFile=0;
+    if contains(inputfilename,'.mat'), isMatFile=1; end
+    
+    
+    % load & check mappinfile
+    mappingfile = myScriptData.RUNGROUPMAPPINGFILE{myScriptData.CURRENTRUNGROUP};
+    if isempty(mappingfile)
+        myScriptData.RUNGROUPMAPPINGFILE{myScriptData.CURRENTRUNGROUP} = '';
+    elseif ~exist(mappingfile,'file')
+        msg=sprintf('The provided .mapping file for the Rungroup %s does not exist.',myScriptData.RUNGROUPNAMES{myScriptData.CURRENTRUNGROUP});
+        errordlg(msg);
+        error('problem with mappinfile.')
+    else
+        files{end+1}=mappingfile;
+    end    
+
+    if myScriptData.DO_CALIBRATE == 1 && ~isMatFile     % mat.-files are already calibrated
         if ~isempty(myScriptData.CALIBRATIONFILE)
             if exist(myScriptData.CALIBRATIONFILE,'file')
                 files{end+1} = myScriptData.CALIBRATIONFILE;
@@ -1011,57 +1129,42 @@ function ProcessACQFile(inputfilename,inputfiledir)
 
 %%%%%%% read in the files in TS.  index is index with TS{index}=current ts
 %%%%%%% structure
-    index = ioReadTS(files{:});
+    if isMatFile
+        index=ioReadMAT(files{:});
+    else
+        index = ioReadTS(files{:});
+    end
     
+    
+%%%%% make ts.filename only the filename without the path
 
+[~,filename,ext]=fileparts(TS{index}.filename);
+TS{index}.filename=[filename ext];
+    
+    
+    
+    
     
 %%%%%% check if dimensions of potvals are correct, issure error msg if not
-    if size(TS{index}.potvals,1) < myScriptData.MAXLEAD
+    if size(TS{index}.potvals,1) < myScriptData.MAXLEAD{myScriptData.CURRENTRUNGROUP}
         errordlg('Maximum lead in settings is greater than number of leads in file');
         cd(olddir);
         error('ERROR');
     end
     
 
-    
-%%% set up Pacing Lead %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if ~isempty(myScriptData.PACINGLEAD) && (myScriptData.PACINGLEAD > 0) && (myScriptData.PACINGLEAD <= size(TS{index}.potvals,1))
-         sigDetectPacing(index,myScriptData.PACINGLEAD);  
-        % CURRENTLY BLANK THE DETECTED FIDUCIALS AS WE WON'T USE THEM RIGHT
-        % NOW. THE PACING IS ALSO STORED AS A VECTOR IN PACING, WHICH IS
-        % MORE ACCESSIBLE.      
-        TS{index}.fids = [];
-        TS{index}.fidset = {};
-    end
-    
-    
-    
 %%%% ImportUserSettings (put Data from myProcessingData in TS{currentTS} %%%%%%%%%%    
     fieldstoload = {'SELFRAMES','AVERAGEMETHOD','AVERAGESTART','AVERAGECHANNEL','AVERAGERMSTYPE','AVERAGEEND','AVERAGEFRAMES','TEMPLATEFRAMES'};
     if myScriptData.DO_ADDBADLEADS, fieldtoload{end+1} = 'LEADINFO'; end   % DO_ADDBA.. doesnt exist.. remove? TO DO
-        
+      
     ImportUserSettings(inputfilename,index,fieldstoload);
     
-
     
-    
-%%%%  store the GBADLEADS also in the ts structure (in ts.leadinfo)%%%%          
-    for p=1:length(myScriptData.GBADLEADS), tsSetBad(index,myScriptData.GBADLEADS{p}); end
-    % I feel like this is done wrong! if gr1=1:10 and gr2=11:20 and
-    % gr1_badleads=[1, 2] and gr2_badleads=[2 15],  only
-    % leadinfo([1,2,3])=1.  15 is out of 1:length(groupleads von gr2 )  ...
-
-    
-
+%%%%  store the GBADLEADS also in the ts structure (in ts.leadinfo)%%%% 
+    badleads=myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP};
+    TS{index}.leadinfo(badleads) = 1;
+        
 %%%%% do the temporal filter of current file %%%%%%%%%%%%%%%%
-% this uses the matlab 'filter' function, which uses a rational transfer
-% function
-% some more notes on this:
-% initialised as follows:
-%     'FILTERNAME','NONE','string',...
-%     'FILTERNAMES',{'NONE'},'string',...
-%     'FILTER',[],'string',...
-% these are tags in old matmap..
     if myScriptData.DO_FILTER      % if 'apply temporal filter' is selected
         if 0 %isfield(myScriptData,'FILTER')     % this doesnt work atm, cause buttons for Filtersettings etc have been removed
             myScriptData.FILTERSETTINGS = [];
@@ -1074,8 +1177,7 @@ function ProcessACQFile(inputfilename,inputfiledir)
             myScriptData.FILTERSETTINGS.B = [0.03266412226059 0.06320942361376 0.09378788647083 0.10617422096837 0.09378788647083 0.06320942361376 0.03266412226059];
             myScriptData.FILTERSETTINGS.A = 1;
         end
-        myTemporalFilter(index);    % no add audit? shouldnt it be recordet somewhere that this was filtered??? TODO
-        
+        temporalFilter(index);    % no add audit? shouldnt it be recordet somewhere that this was filtered??? TODO
     end
         
 
@@ -1088,40 +1190,23 @@ function ProcessACQFile(inputfilename,inputfiledir)
 % - calls sigSlice, which in this case:  updates TS{currentIndex} bei
 % keeping only the timeframe-window specified in ts.selframes
     
-
-
-
     if myScriptData.DO_SLICE == 1   % DO_SLICE is 1 by default and is never changed, so always 1 -> obsolete?! DOTO  
         if myScriptData.DO_SLICE_USER == 1  %if 'user interaction' button is pressed
-            handle = mySliceDisplay(index); % this only changes selframes? I think it also uses ts.averageframes (and all from export userlist bellow?)
+            handle = mySliceDisplay(index); % this only changes selframes I think it also uses ts.averageframes (and all from export userlist bellow?)
+         
             waitfor(handle);
-           
-            
+ 
             switch myScriptData.NAVIGATION
                 case {'prev','next','stop','back'}, cd(olddir); tsClear(index); return; 
             end
-                
 
-            
-            
-            %TODO  why is this here where it only happens with user
-            %interaction
-            % I think this code is stupid! if gr1=1:10, bl1=1,2,14 and
-            % gr2=20:30, bl2=5,6,27.  before these lines Groupleads is
-            % {[1,2,14], [5 6 27]} and after its { [1;2;5;6],[]}  Note the
-            % ;   problem: badleads are updatet acc to GBADLEADS, which is
-            % screwed.   this also results in wrong coloring in display
-            % local fids (wrong bad leads are black)
-
-            asc=myScriptData.GROUPBADLEADS;
             if myScriptData.KEEPBADLEADS == 1
                 badleads = tsIsBad(index);
-                for p=1:length(myScriptData.GROUPBADLEADS) 
-                    [~,localindex] = intersect(myScriptData.GROUPLEADS{p},badleads);
-                    myScriptData.GROUPBADLEADS{p} = localindex;
+                for p=1:length(myScriptData.GROUPBADLEADS{myScriptData.CURRENTRUNGROUP}) 
+                    [~,localindex] = intersect(myScriptData.GROUPLEADS{myScriptData.CURRENTRUNGROUP}{p},badleads);
+                    myScriptData.GROUPBADLEADS{myScriptData.CURRENTRUNGROUP}{p} = localindex;
                 end
             end
-            esc=myScriptData.GROUPBADLEADS;
 
             
             
@@ -1130,6 +1215,7 @@ function ProcessACQFile(inputfilename,inputfiledir)
             
             ExportUserSettings(inputfilename,index,{'SELFRAMES','AVERAGEMETHOD','AVERAGECHANNEL','AVERAGERMSTYPE','AVERAGESTART','AVERAGEEND','AVERAGEFRAMES','TEMPLATEFRAMES','LEADINFO'});
         end
+        
         % CONTINUE AND DO THE SLICING/AVERAGING OPERATION
         sigSlice(index);   % keeps only the selected timeframes in the potvals, using ts.selframes as start and endpoint
     end
@@ -1141,23 +1227,26 @@ function ProcessACQFile(inputfilename,inputfiledir)
         tsSetBlank(index,badleads);
         tsAddAudit(index,'|Blanked out bad leads');
     end
-
-    
-    
+ 
     
  %%%%%% import more Usersettings from myProcessingData into TS{index} %%%%
     fieldstoload = {'FIDS','FIDSET','STARTFRAME'};
     ImportUserSettings(inputfilename,index,fieldstoload);
     
-    
 %%%%%%%%%% start baseline stuff %%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if (myScriptData.DO_BASELINE == 1)||(myScriptData.DO_DELTAFOVERF == 1)
-        
-    
-    %%%% shift fiducial shift ficucials to the new local frame %%%%%%%%%%%%
+    if myScriptData.DO_BASELINE_USER, myScriptData.DO_BASELINE = 1; end
+    if (myScriptData.DO_BASELINE == 1)
+    %%%% shift ficucials to the new local frame %%%%%%%%%%%%
     % fids are always in local frame, but because user selected new local
     % frame (the selframe), the local frame changed!
+    
+        if ~isfield(TS{index},'selframes')
+            msg=sprintf('Couldn''t find any selected start/end time frames for %s. Either provide one by using a myProcessingData file where this information has been saved previously or select ''User Interaction'' at the Slice/Average'' section to manually select a start/end time frame.',TS{index}.filename);
+            errordlg(msg)
+            TS{index}=[];
+            error('ERROR')
+        end
         if ~isfield(TS{index},'startframe'), TS{index}.startframe = 1; end
         newstartframe = TS{index}.selframes(1);  
         oldstartframe = TS{index}.startframe(1);          
@@ -1176,21 +1265,15 @@ function ProcessACQFile(inputfilename,inputfiledir)
             fidsAddFiducial(index,1,'baseline');
             fidsAddFiducial(index,framelength-baselinewidth+1,'baseline');
         end
-     
-        
     %%%% if 'Pre-RMS Baseline correction' button is pressed, do baseline
     %%%% corection of current index (before user selects anything..
         if myScriptData.DO_BASELINE_RMS == 1
             baselinewidth = myScriptData.BASELINEWIDTH;
             sigBaseLine(index,[],baselinewidth);
         end
-        
-        
-        
-    %%%%   open Fidsdisplay in mode 2, let user select fids, also do some navigation 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    %%%%   open Fidsdisplay in mode 2, (baseline mode)
         if myScriptData.DO_BASELINE_USER == 1
-            
             handle = myFidsDisplay(index,2);    % this changes fids, but nothing else
             waitfor(handle);
             
@@ -1202,19 +1285,17 @@ function ProcessACQFile(inputfilename,inputfiledir)
         ExportUserSettings(inputfilename,index,{'SELFRAMES','AVERAGEMETHOD','AVERAGECHANNEL','AVERAGERMSTYPE','AVERAGESTART','AVERAGEEND','AVERAGEFRAMES','TEMPLATEFRAMES','LEADINFO','FIDS','FIDSET','STARTFRAME'});
 
         
-        
-        
-    %%%% Do_DeltaFOVERF, if that option is selected  (get rid of??)
-        if myScriptData.DO_DELTAFOVERF == 1 
-            fidsFindFids(index,20)
-            fidsFindFids(index,21)
-            if isempty(fidsFindFids(index,20))||isempty(fidsFindFids(index,21))  %this is always the case?! since 20 and 21 dont exist in fids fkt
-                han = errordlg('No interval specified for DetlaF over F correction, skipping correction');
-                waitfor(han);
-            else            
-                sigDeltaFoverF(index);
-            end
-        end          
+%     %%%% Do_DeltaFOVERF, if that option is selected  (get rid of??)
+%         if myScriptData.DO_DELTAFOVERF == 1 
+%             fidsFindFids(index,20)
+%             fidsFindFids(index,21)
+%             if isempty(fidsFindFids(index,20))||isempty(fidsFindFids(index,21))  %this is always the case?! since 20 and 21 dont exist in fids fkt
+%                 han = errordlg('No interval specified for DetlaF over F correction, skipping correction');
+%                 waitfor(han);
+%             else            
+%                 sigDeltaFoverF(index);
+%             end
+%         end          
         
         
     %%%% now do the final baseline correction
@@ -1236,86 +1317,89 @@ function ProcessACQFile(inputfilename,inputfiledir)
     
     %%% Do_LAPLACIAN_INTERPOLATE %%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if myScriptData.DO_LAPLACIAN_INTERPOLATE == 1
-        
-         %%% find the groups to be processed. splitgroup=[1 3] if there are
-         %%% 3 groups but the 2 shouldnt be processed
-        splitgroup = [];
-        for p=1:length(myScriptData.GROUPNAME)
-            if myScriptData.GROUPDONOTPROCESS{p} == 0, splitgroup = [splitgroup p]; end
-        end
-        
-        
-        
-        for q=1:length(splitgroup)   %for each group to be processed
-            
-            %%% continue, if group has no bad leads
-            if isempty(myScriptData.GBADLEADS{splitgroup(q)})
-                continue;
-            end
-            
-            
-            %%% initialice LIBADLEADS with [], if not initialized yet
-            if ~isfield(myProcessingData,'LIBADLEADS')
-                myProcessingData.LIBADLEADS{q} = [];
-            end
-            
-            
-            %%% if GBADLEADS(groupIndex) without LIBADLEADS(groupIndex) is
-            %%% not empty
-            if ~isempty(setdiff(myScriptData.GBADLEADS{splitgroup(q)},myProcessingData.LIBADLEADS{q}))
-                myProcessingData.LI{splitgroup(q)} = [];
-                
-                
-                %%% if no GROUPGEOM-file is given, continue
-                %%% file= { GEOM-File,  GroupChannel-File} 
-                files = {};
-                files{1} = myScriptData.GROUPGEOM{splitgroup(q)};
-                if isempty(files{1})
-                    continue;
-                end
-                if ~isempty(myScriptData.GROUPCHANNELS{splitgroup(q)})
-                    files{2} = myScriptData.GROUPCHANNELS{splitgroup(q)};
-                end
-                
-                
-                
-                
-                myProcessingData.LI{splitgroup(q)} = sparse(triLaplacianInterpolation(files{:},myScriptData.GBADLEADS{splitgroup(q)},length(myScriptData.GROUPLEADS{splitgroup(q)})));
-            end
-            
-            
-            %%% continue, if triLaplacian interpolation didnt return
-            %%% anything
-            if isempty(myProcessingData.LI{splitgroup(q)})
-                continue;
-            end
-            
-            %%% potvals(groupleads{p})=potvals(groupleads{p})*LI{p}..
-            leads = myScriptData.GROUPLEADS{splitgroup(q)};
-            TS{index}.potvals(leads,:) = myProcessingData.LI{splitgroup(q)}*TS{index}.potvals(leads,:);
-            
-            
-            %%% mark interpolated leads as interpolated
-            tsSetInterp(index,leads(myScriptData.GBADLEADS{splitgroup(q)}));
-          
-        end
-        tsAddAudit(index,'|Interpolated bad leads (Laplacian interpolation)');
-    end
-    
+%     if myScriptData.DO_LAPLACIAN_INTERPOLATE == 1
+%         
+%          %%% find the groups to be processed. splitgroup=[1 3] if there are
+%          %%% 3 groups but the 2 shouldnt be processed
+%         splitgroup = [];
+%         for p=1:length(myScriptData.GROUPNAME{myScriptData.CURRENTRUNGROUP})
+%             if myScriptData.GROUPDONOTPROCESS{myScriptData.CURRENTRUNGROUP}{p} == 0, splitgroup = [splitgroup p]; end
+%         end
+%         
+%         
+%         
+%         for q=1:length(splitgroup)   %for each group to be processed
+%             
+%             %%% continue, if group has no bad leads
+%             if isempty(myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})
+%                 continue;
+%             end
+%             
+%             
+%             %%% initialice LIBADLEADS with [], if not initialized yet
+%             if ~isfield(myProcessingData,'LIBADLEADS')
+%                 myProcessingData.LIBADLEADS{myScriptData.CURRENTRUNGROUP}{q} = [];
+%             end
+%             
+%             
+%             %%% if GBADLEADS(groupIndex) without LIBADLEADS(groupIndex) is
+%             %%% not empty
+%             if ~isempty(setdiff(myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)},myProcessingData.LIBADLEADS{myScriptData.CURRENTRUNGROUP}{q}))
+%                 myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)} = [];
+%                 
+%                 
+%                 %%% if no GROUPGEOM-file is given, continue
+%                 %%% file= { GEOM-File,  GroupChannel-File} 
+%                 files = {};
+%                 files{1} = myScriptData.GROUPGEOM{myScriptData.CURRENTRUNGROUP}{splitgroup(q)};
+%                 if isempty(files{1})
+%                     continue;
+%                 end
+%                 if ~isempty(myScriptData.GROUPCHANNELS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})
+%                     files{2} = myScriptData.GROUPCHANNELS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)};
+%                 end
+%                 
+%                 
+%                 
+%                 
+%                 myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)} = sparse(triLaplacianInterpolation(files{:},myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)},length(myScriptData.GROUPLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})));
+%             end
+%             
+%             
+%             %%% continue, if triLaplacian interpolation didnt return
+%             %%% anything
+%             if isempty(myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})
+%                 continue;
+%             end
+%             
+%             %%% potvals(groupleads{p})=potvals(groupleads{p})*LI{p}..
+%             leads = myScriptData.GROUPLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)};
+%             TS{index}.potvals(leads,:) = myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)}*TS{index}.potvals(leads,:);
+%             
+%             
+%             %%% mark interpolated leads as interpolated
+%             tsSetInterp(index,leads(myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)}));
+%           
+%         end
+%         tsAddAudit(index,'|Interpolated bad leads (Laplacian interpolation)');
+%     end
     
     
     %%%%%%%% now detect the rest of fiducials, if 'detect fids' was selected   
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+    if myScriptData.DO_DETECT_USER, myScriptData.DO_DETECT=1; end
     if myScriptData.DO_DETECT == 1
-        
         fieldstoload = {'FIDS','FIDSET','STARTFRAME'};
         ImportUserSettings(inputfilename,index,fieldstoload);
         
         
         %%% fids shift, same as in baseline stuff, to get to local frame?!
+        if ~isfield(TS{index},'selframes')
+            msg=sprintf('Couldn''t find any selected start/end time frames for %s. Either provide one by using a myProcessingData file where this information has been saved previously or select ''User Interaction'' at the Slice/Average'' section to manually select a start/end time frame.',TS{index}.filename);
+            errordlg(msg)
+            TS{index}=[];
+            error('ERROR')
+        end
         if ~isfield(TS{index},'startframe'), TS{index}.startframe = 1; end      
         newstartframe = TS{index}.selframes(1);
         oldstartframe = TS{index}.startframe(1);        
@@ -1336,8 +1420,10 @@ function ProcessACQFile(inputfilename,inputfiledir)
         
         
         %%%%%% open FidsDisplay again, this time to select fiducials
+        
         if myScriptData.DO_DETECT_USER == 1
-            handle = myFidsDisplay(index);
+            handle = myFidsDisplay(index);    
+            
             waitfor(handle);
             switch myScriptData.NAVIGATION
                 case {'prev','next','stop','redo','back'}, cd(olddir); tsClear(index); return; 
@@ -1347,9 +1433,7 @@ function ProcessACQFile(inputfilename,inputfiledir)
         ExportUserSettings(inputfilename,index,{'SELFRAMES','AVERAGEMETHOD','AVERAGERMSTYPE','AVERAGECHANNEL','AVERAGESTART','AVERAGEEND','AVERAGEFRAMES','TEMPLATEFRAMES','LEADINFO','FIDS','FIDSET','STARTFRAME'});
     end
     
-    
-    
-    
+        
     %%%% this blog does the splitting. In detail it
     % - creates numgroups new ts structures (one for each group) using
     % tsSplitTS
@@ -1358,95 +1442,94 @@ function ProcessACQFile(inputfilename,inputfiledir)
     % stuff
     % - original ts (the one thats splittet) is cleared
     % - index is now index array of the splittet sub ts!!
-    
-    %I think this part needs some updating (get rid of tsdf) TODO
-    
-    if myScriptData.DO_SPLIT == 1     % DO_SPLIT is never changed?! Remove it? TODO
-        splitgroup = [];
-        for p=1:length(myScriptData.GROUPNAME)
-            if myScriptData.GROUPDONOTPROCESS{p} == 0, splitgroup = [splitgroup p]; end
-        end
-        % splitgroup is now eg [1 3] if there are 3 groups but the 2 should
-        % not be processed
-        disp('here')
-        channels=myScriptData.GROUPLEADS(splitgroup);
-        indices = mytsSplitTS(index, channels);
-        return %anton
-        tsDeal(indices,'filename',ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION(splitgroup))); 
-        tsClear(index);        
-        index = indices;
 
+    %%%% split TS{index} into numGroups smaller ts
+    splitgroup = [];
+    for p=1:length(myScriptData.GROUPNAME{myScriptData.CURRENTRUNGROUP})
+        if myScriptData.GROUPDONOTPROCESS{myScriptData.CURRENTRUNGROUP}{p} == 0, splitgroup = [splitgroup p]; end
     end
+    % splitgroup is now eg [1 3] if there are 3 groups but the 2 should
+    % not be processed
+    channels=myScriptData.GROUPLEADS{myScriptData.CURRENTRUNGROUP}(splitgroup);
+    indices = mytsSplitTS(index, channels);    
+    tsDeal(indices,'filename',ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION{myScriptData.CURRENTRUNGROUP}(splitgroup))); 
+    tsClear(index);        
+    index = indices;
+
 
     
     
-    %%%% do trilaplacian interpolation for each ts 
-    if myScriptData.DO_INTERPOLATE == 1     % if second 'Interpolate' button is on
-        if myScriptData.DO_SPLIT == 0
-            error('Need to split the signal before interpolating');
-        end
-        for q=1:length(index)    %remember, index is now array
-            
-            if isempty(myScriptData.GBADLEADS{splitgroup(q)})
-                continue;
-            end
-                
-            if ~isempty(setdiff(myScriptData.GBADLEADS{splitgroup(q)},myProcessingData.LIBADLEADS{q}))
-                myProcessingData.LI{splitgroup(q)} = [];
-                
-                if myScriptData.GROUPDONOTPROCESS{splitgroup(q)} == 1
-                    continue;
-                end
-                
-                files = {};
-                files{1} = myScriptData.GROUPGEOM{splitgroup(q)};
-                if isempty(files{1})
-                    continue;
-                end
-                if ~isempty(myScriptData.GROUPCHANNELS{splitgroup(q)})
-                    files{2} = myScriptData.GROUPCHANNELS{splitgroup(q)};
-                end
-
-                myProcessingData.LI{splitgroup(q)} = sparse(triLaplacianInterpolation(files{:},SCRIPT.GBADLEADS{splitgroup(q)},length(myScriptData.GROUPLEADS{splitgroup(q)})));
-            end
-            
-            if isempty(myProcessingData.LI{splitgroup(q)})
-                continue;
-            end
-            
-            TS{index(q)}.potvals = myProcessingData.LI{splitgroup(q)}*TS{index(q)}.potvals;
-            tsSetInterp(index(q),myScriptData.GBADLEADS{splitgroup(q)});
-            tsAddAudit(index(q),'|Interpolated bad leads (Laplacian interpolation)');
-            
-        end
-    end
+%     %%%% do trilaplacian interpolation for each ts 
+%     if myScriptData.DO_INTERPOLATE == 1     % if second 'Interpolate' button is on
+%         if myScriptData.DO_SPLIT == 0
+%             error('Need to split the signal before interpolating');
+%         end
+%         for q=1:length(index)    %remember, index is now array
+%             
+%             if isempty(myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})
+%                 continue;
+%             end
+%                 
+%             if ~isempty(setdiff(myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)},myProcessingData.LIBADLEADS{myScriptData.CURRENTRUNGROUP}{q}))
+%                 myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)} = [];
+%                 
+%                 if myScriptData.GROUPDONOTPROCESS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)} == 1
+%                     continue;
+%                 end
+%                 
+%                 files = {};
+%                 files{1} = myScriptData.GROUPGEOM{myScriptData.CURRENTRUNGROUP}{splitgroup(q)};
+%                 if isempty(files{1})
+%                     continue;
+%                 end
+%                 if ~isempty(myScriptData.GROUPCHANNELS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})
+%                     files{2} = myScriptData.GROUPCHANNELS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)};
+%                 end
+% 
+%                 myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)} = sparse(triLaplacianInterpolation(files{:},SCRIPT.GBADLEADS{splitgroup(q)},length(myScriptData.GROUPLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})));
+%             end
+%             
+%             if isempty(myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)})
+%                 continue;
+%             end
+%             
+%             TS{index(q)}.potvals = myProcessingData.LI{myScriptData.CURRENTRUNGROUP}{splitgroup(q)}*TS{index(q)}.potvals;
+%             tsSetInterp(index(q),myScriptData.GBADLEADS{myScriptData.CURRENTRUNGROUP}{splitgroup(q)});
+%             tsAddAudit(index(q),'|Interpolated bad leads (Laplacian interpolation)');
+%             
+%         end
+%     end
     
-    myScriptData.MATODIRON
+
     %%%% save the new ts structures using ioWriteTS
-    if myScriptData.MATODIRON == 1   %TODO    do I ever want this to be off?
-
-        olddir = cd(myScriptData.MATODIR);
-        tsDeal(index,'filename',ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION(splitgroup)));
-        ioWriteTS(index,'noprompt','oworiginal');
-        cd(olddir);
-    end
-    
+    olddir = cd(myScriptData.MATODIR);
+    tsDeal(index,'filename',ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION{myScriptData.CURRENTRUNGROUP}(splitgroup)));
+    ioWriteTS(index,'noprompt','oworiginal');
+    cd(olddir);
 
     
-    %%%% do integral maps and save them  --> I worry about this later
+    %%%% do integral maps and save them  
     if myScriptData.DO_INTEGRALMAPS == 1
         if myScriptData.DO_DETECT == 0
-            error('Need fiducials to do integralmaps');
+            msg=sprintf('Need fiducials (at least QRS wave or T wave) to do integral maps for %s.', inputfilename);
+            errordlg(msg)
+            error('Need fiducials to do integral maps');
         end
         mapindices = fidsIntAll(index);
+        if length(splitgroup)~=length(mapindices)
+            msg=sprintf('Fiducials (QRS wave or T wave) necessary to do integral maps. However, for %s there are no fiducials for all groups.',inputfilename);
+            errordlg(msg)
+            error('No fiducials for integralmaps.')
+        end
+        
+        olddir = cd(myScriptData.MATODIR); 
+        fnames=ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION{myScriptData.CURRENTRUNGROUP}(splitgroup),'-itg');
 
-        if (myScriptData.MATODIRON==1)
-            olddir = cd(myScriptData.MATODIR); 
-            tsDeal(mapindices,'filename',ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION(splitgroup),'-itg')); 
-            tsSet(mapindices,'newfileext','');
-            ioWriteTS(mapindices,'noprompt','oworiginal');
-            cd(olddir);
-        end     
+        tsDeal(mapindices,'filename',fnames); 
+        tsSet(mapindices,'newfileext','');
+        ioWriteTS(mapindices,'noprompt','oworiginal');
+        cd(olddir);
+    
         tsClear(mapindices);
     end
     
@@ -1459,58 +1542,52 @@ function ProcessACQFile(inputfilename,inputfiledir)
         end
         
         %%%% make new ts at TS(mapindices). That new ts is like the old
-        %%%% one, but has ts.potvals=[act; rec; act-rec]
+        %%%% one, but has ts.potvals=[act rec act-rec]
         mapindices = sigActRecMap(index);   
         
         
         %%%%  save the 'new act/rec' ts as eg 'Run0009-gr1-ari.mat
         % AND clearTS{mapindex}!
-        if (myScriptData.MATODIRON == 1)
-            olddir = cd(myScriptData.MATODIR);
-            tsDeal(mapindices,'filename',ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION(splitgroup),'-ari')); 
-            tsSet(mapindices,'newfileext','');
-            ioWriteTS(mapindices,'noprompt','oworiginal');
-            cd(olddir);
-        end       
+        olddir = cd(myScriptData.MATODIR);
+        tsDeal(mapindices,'filename',ioUpdateFilename('.mat',inputfilename,myScriptData.GROUPEXTENSION{myScriptData.CURRENTRUNGROUP}(splitgroup),'-ari')); 
+        tsSet(mapindices,'newfileext','');
+        ioWriteTS(mapindices,'noprompt','oworiginal');
+        cd(olddir);
         tsClear(mapindices);
         
-        
-        
-        
-        %%%%%%  all this just changes TS{index}, but those ts are cleared
-        %%%%%%  without any saving.. totally useless??
-        
-        s = tsNew(length(index));    
-        for j=1:length(index)
-            
-            
-            %%%% make acttime=[act1; act2; act2] .. all the local act
-            %%%% timeframes,   
-            acttime = floor(fidsFindLocalFids(index(j),'act'));
-            acttime = round(median([ones(size(acttime)) acttime  (TS{index(j)}.numframes-1)*ones(size(acttime))],2));
- 
-            %%%% why is this commented out?
-            for p=1:TS{index(j)}.numleads
-%                keyboard
-                if ~isempty(acttime)
-                    %dvdt(p) = (TS{index(j)}.potvals(p,acttime(p)+1) - TS{index(j)}.potvals(p,acttime(p)))/TS{index(j)}.samplefrequency;    
-                else
-                    %dvdt(p) = 0;
-                end
-            end
-           % TS{index(j)}.dvdt = dvdt;
-           
-           
-            TS{s(j)} = TS{index(j)};
-            %TS{s(j)}.potvals = dvdt;
-            TS{s(j)}.numframes = 1;
-            TS{s(j)}.pacing = [];
-            TS{s(j)}.fids = [];
-            TS{s(j)}.fidset = {};
-            TS{s(j)}.audit = '| Dv/Dt at activation';           
-        end
-        tsClear(s);  %% why clear everything --> makes above pointless?? TODO
-
+%         %%%%%%  all this just changes TS{index}, but those ts are cleared
+%         %%%%%%  without any saving.. totally useless??
+%         
+%         s = tsNew(length(index));    
+%         for j=1:length(index)
+%             
+%             
+%             %%%% make acttime=[act1; act2; act2] .. all the local act
+%             %%%% timeframes,   
+%             acttime = floor(fidsFindLocalFids(index(j),'act'));
+%             acttime = round(median([ones(size(acttime)) acttime  (TS{index(j)}.numframes-1)*ones(size(acttime))],2));
+%  
+%             %%%% why is this commented out?
+%             for p=1:TS{index(j)}.numleads
+% %                keyboard
+%                 if ~isempty(acttime)
+%                     %dvdt(p) = (TS{index(j)}.potvals(p,acttime(p)+1) - TS{index(j)}.potvals(p,acttime(p)))/TS{index(j)}.samplefrequency;    
+%                 else
+%                     %dvdt(p) = 0;
+%                 end
+%             end
+%            % TS{index(j)}.dvdt = dvdt;
+%            
+%            
+%             TS{s(j)} = TS{index(j)};
+%             %TS{s(j)}.potvals = dvdt;
+%             TS{s(j)}.numframes = 1;
+%             TS{s(j)}.pacing = [];
+%             TS{s(j)}.fids = [];
+%             TS{s(j)}.fidset = {};
+%             TS{s(j)}.audit = '| Dv/Dt at activation';           
+%         end
+%         tsClear(s);  %% why clear everything --> makes above pointless?? TODO
    end
    
    
@@ -1609,13 +1686,10 @@ function tf = isCorrectFile(pathstring,toBeFile,flag)
 %-  if yes, it checks if that struct has all the fields it is supposed to
 %   have
 
-    defaultsettings = { 'PWD','','file',...
-                    'MAPPINGFILE','','file', ...
-                    'PACINGLEAD',[],'double', ...
+    nec_fields = { 'PWD','','file',...
                     'CALIBRATIONFILE','','file', ...
                     'CALIBRATIONACQ','','vector', ...
                     'CALIBRATIONACQUSED','','vector',...
-                    'CALIBRATIONMAPPINGUSED','','file',...
                     'SCRIPTFILE','myScriptData.mat','file',...
                     'ACQLABEL','','string',...
                     'ACQLISTBOX','','listbox',...
@@ -1635,13 +1709,11 @@ function tf = isCorrectFile(pathstring,toBeFile,flag)
                     'GROUPNAME','GROUP','groupstring',... 
                     'GROUPLEADS',[],'groupvector',...
                     'GROUPEXTENSION','-ext','groupstring',...
-                    'GROUPTSDFC','group.tsdfc','groupfile',...
                     'GROUPGEOM','','groupfile',...
                     'GROUPCHANNELS','','groupfile',...
                     'GROUPBADLEADSFILE','','groupfile',...
                     'GROUPBADLEADS',[],'groupvector',...
                     'GROUPDONOTPROCESS',0,'groupbool',...
-                    'GROUPDONOTDISPLAY',0,'groupbool',...
                     'GROUPSELECT',0,'select',...
                     'DO_CALIBRATE',1,'bool',...
                     'DO_BLANKBADLEADS',1,'bool',...
@@ -1661,7 +1733,6 @@ function tf = isCorrectFile(pathstring,toBeFile,flag)
                     'DO_LAPLACIAN_INTERPOLATE',1,'bool',...
                     'DO_INTERPOLATE',0,'bool',...
                     'DO_INTEGRALMAPS',1,'bool',...
-                    'DO_ACTIVATION',0,'bool',...
                     'DO_ACTIVATIONMAPS',1,'bool',...
                     'DO_FILTER',0,'bool',...
                     'NAVIGATION','apply','string',...
@@ -1704,9 +1775,6 @@ function tf = isCorrectFile(pathstring,toBeFile,flag)
                     'TSDFODIR','tsdf','string',...
                     'TSDFODIRON',1,'bool',...
                     'MATODIR','mat','string',...
-                    'MATODIRON',1,'bool',...      %kann weg
-                    'SCIMATODIR','scimat','string',...
-                    'SCIMATODIRON',0,'bool',...
                     'ACTWIN',7,'integer',...
                     'ACTDEG',3,'integer',...
                     'ACTNEG',1,'integer',...
@@ -1726,6 +1794,8 @@ function tf = isCorrectFile(pathstring,toBeFile,flag)
                     'FILTER',[],'string',...
                     'INPUTTSDFC','','string'
             };
+        
+
 metastruct=load(pathstring);
 
 if nargin==3 && strcmp(flag,'supressMessages')
@@ -1745,9 +1815,9 @@ end
 
 switch toBeFile
     case 'myScriptData'
-        for p=1:3:length(defaultsettings)
-            if ~isfield(loadedStruct,defaultsettings{p})
-                errormsg = sprintf('The choosen file doesn''t seem to be a myScriptData file. \n It doesn''t have the %s field.', defaultsettings{p});
+        for p=1:3:length(nec_fields)
+            if ~isfield(loadedStruct,nec_fields{p})
+                errormsg = sprintf('The choosen file doesn''t seem to be a myScriptData file. \n It doesn''t have the %s field.', nec_fields{p});
                 if msg; errordlg(errormsg); end
                 tf=0;
                 return
@@ -1769,7 +1839,12 @@ end
 
 function dealWithNewMyScriptData(newFileString)
 %whenever path to myScriptData is changed to newFileString, this function
-%checks the newFileString and deals with it appropriatly
+% - checks if the path to new file & the file itself is correct
+% - converts old myScriptData files to the new rungroup format
+% - updates .SCRIPTDATA etc
+% - updates figure
+
+
     global myScriptData myProcessingData
     oldMyProcessingDataPath=myScriptData.DATAFILE;
     [path, filename, ext]=fileparts(newFileString);
@@ -1788,6 +1863,7 @@ function dealWithNewMyScriptData(newFileString)
     elseif exist(newFileString,'file')
         if isCorrectFile(newFileString,'myScriptData')
             load(newFileString)
+            old2newMyScriptData
             myScriptData.SCRIPTFILE=newFileString; 
         else
             myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
@@ -1797,13 +1873,19 @@ function dealWithNewMyScriptData(newFileString)
         save(newFileString,'myScriptData')
     end
     
-    
+    %%%% check the myProcessingData specified in the new myScriptData
     if exist(myScriptData.DATAFILE,'file') && isCorrectFile(newFileString,'myProcessingScript','supressMessages') 
-        load(myScriptData.DATAFILE)
+        load(myScriptData.DATAFILE)    
     else
-        errordlg('This myScriptData contained the path to a non existend or wrong myProcessingData. Therefore the origial myProcessingData is kept.')
+        errordlg('This myScriptData contained the path to a non existend or wrong myProcessingData. Therefore the origial myProcessingData is kept. The new MyScriptData is still loaded.')
         myScriptData.DATAFILE=oldMyProcessingDataPath;
     end
+    
+    
+    
+    
+    
+    
     myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
     myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTMENU'));
     myUpdateACQFiles;
@@ -1853,16 +1935,17 @@ function   checkNewInput(handle, tag)
                 myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
                 error('ERROR')
             end
-        case {'CALIBRATIONFILE', 'MAPPINGFILE'}
+        case {'CALIBRATIONFILE', 'RUNGROUPMAPPINGFILE'}
             pathstring=get(handle,'string');
-            if ~exist(pathstring,'file')
+            if ~exist(pathstring,'file') && ~isempty(pathstring)
                 errordlg('Specified file doesn''t exist.')
                 myUpdateFigure(findobj(allchild(0),'tag','PROCESSINGSCRIPTSETTINGS'));
                 error('ERROR')
             end
         case 'GROUPNAME'
             newGroupName=get(handle,'string');
-            existingGroups=myScriptData.GROUPNAME;
+            existingGroups=myScriptData.GROUPNAME{myScriptData.RUNGROUPSELECT};
+            
             existingGroups(myScriptData.GROUPSELECT)=[];
             if ~isempty(find(ismember(existingGroups,newGroupName), 1))
                 errordlg('A group with the same groupname already exists.')
@@ -1875,6 +1958,236 @@ function   checkNewInput(handle, tag)
                 error('ERROR') 
             end
     end  
+end
+
+function old2newMyScriptData()
+%convert old myScriptData without rungroups to the new format
+
+    global myScriptData
+    defaultsettings=getDefaultSettings;
+    
+    
+    
+   
+    
+    %%%%% make sure myScriptData only has the fields specified in default
+    %%%%% settings and no unnecessary fields
+    mappingfile='';
+    if isfield(myScriptData,'MAPPINGFILE'), mappingfile=myScriptData.MAPPINGFILE; end  %remember the mappingfile, before that information is deleted
+    oldfields=fieldnames(myScriptData);
+    fields2beRemoved=setdiff(oldfields,defaultsettings(1:3:end));
+    myScriptData=rmfield(myScriptData,fields2beRemoved);
+    
+    
+    %%%% now set .DEFAULT and TYPE and add missing fields that are
+    %%%% unrelated to (run)groups
+    myScriptData.DEFAULT=struct();
+    myScriptData.TYPE=struct();
+    for p=1:3:length(defaultsettings)
+        myScriptData.DEFAULT.(defaultsettings{p})=defaultsettings{p+1};
+        myScriptData.TYPE.(defaultsettings{p})=defaultsettings{p+2};
+        if ~isfield(myScriptData,defaultsettings{p}) && ~(strncmp(defaultsettings{p+2},'group',5) || strncmp(defaultsettings{p+2},'rungroup',8))
+            myScriptData.(defaultsettings{p})=defaultsettings{p+1};
+        end
+    end
+    
+    
+    %%%% fix some problems with old myScriptData
+    if ~isempty(myScriptData.GROUPNAME)
+        if ~iscell(myScriptData.GROUPNAME{1})  % if it is an old myScriptData
+            len=length(myScriptData.GROUPNAME);
+            for p=1:3:length(defaultsettings)
+                if strncmp(myScriptData.TYPE.(defaultsettings{p}),'group',5) && (length(myScriptData.(defaultsettings{p})) <len)
+                    myScriptData.defaultsettings{p}(1:len)=defaultsettings{p+1};
+                end
+            end
+        end
+    end
+                    
+                
+    
+    
+    
+    %%%% convert 'GROUP..' fields into new format
+    fn=fieldnames(myScriptData.TYPE);
+    rungroupAdded=0;
+    for p=1:length(fn)
+        if strncmp(myScriptData.TYPE.(fn{p}),'group',5)            
+            if ~isempty(myScriptData.(fn{p}))  
+                if ~iscell(myScriptData.(fn{p}){1})
+                    myScriptData.(fn{p})={myScriptData.(fn{p})};
+                    if ~rungroupAdded, rungroupAdded=1; end
+                end
+            end
+        end   
+    end
+
+
+    %%%% create the 'RUNGROUP..'  fields, if there aren't there yet.
+    for p=1:3:length(defaultsettings)
+        if strncmp(defaultsettings{p+2},'rungroup',8)
+            if ~isfield(myScriptData, defaultsettings{p})
+                if rungroupAdded
+                    myScriptData.(defaultsettings{p})={defaultsettings{p+1}};
+                else
+                    myScriptData.(defaultsettings{p})={};
+                end
+            end   
+        end
+    end
+    
+    if ~isempty(mappingfile) %if myScriptData.MAPPINFILE existed, make that mappinfile the mappinfile for all rungroups
+            myScriptData.RUNGROUPMAPPINGFILE=cell(1,length(myScriptData.RUNGROUPNAMES));
+            [myScriptData.RUNGROUPMAPPINGFILE{:}]=deal(mappingfile);
+            
+            myScriptData.RUNGROUPCALIBRATIONMAPPINGUSED=cell(1,length(myScriptData.RUNGROUPNAMES));
+            [myScriptData.RUNGROUPCALIBRATIONMAPPINGUSED{:}]=deal('');
+    end
+    
+    
+    
+    %%%% if there are no rungroups in old myScriptData, set all selected acq
+    %%%% files as default for a newly created rungroup.
+    if rungroupAdded
+        myScriptData.RUNGROUPFILES={myScriptData.ACQFILES};
+    end
+    
+
+    
+    
+    myScriptData.RUNGROUPSELECT=length(myScriptData.RUNGROUPNAMES);
+    if myScriptData.RUNGROUPSELECT > 0
+        myScriptData.GROUPSELECT=length(myScriptData.GROUPNAME{myScriptData.RUNGROUPSELECT});
+    else
+        myScriptData.GROUPSELECT=0;
+    end
+    
+end
+
+
+function defaultsettings=getDefaultSettings
+    defaultsettings = { 'PWD','','file',...
+                    'FILES2SPLIT',[],'vector',...
+                    'SPLITFILECONTAIN','','string',...
+                    'SPLITDIR','','string',...
+                    'SPLITINTERVAL','', 'string',...
+                    'CALIBRATE_SPLIT',1,'integer',...
+                    'PACINGLEAD',[],'double', ...
+                    'CALIBRATIONFILE','','file', ...
+                    'CALIBRATIONACQ','','vector', ...
+                    'CALIBRATIONACQUSED','','vector',...
+                    'SCRIPTFILE','myScriptData.mat','file',...
+                    'ACQLABEL','','string',...
+                    'ACQLISTBOX','','listbox',...
+                    'ACQFILES',[],'listboxedit',...
+                    'ACQPATTERN','','string',...
+                    'ACQFILENUMBER',[],'vector',...
+                    'ACQINFO',{},'string',...
+                    'ACQFILENAME',{},'string',...
+                    'ACQNUM',0,'integer',...
+                    'DATAFILE','myProcessingData.mat','file',...
+                    'TSDFDIR','autoprocessing','file',...
+                    'ACQDIR','','file',...
+                    'ACQCONTAIN','','string',...
+                    'ACQCONTAINNOT','','string',...
+                    'ACQEXT','.acq,.ac2','string',...   
+                    'BASELINEWIDTH',5,'integer',...
+                    'GROUPNAME','GROUP','groupstring',... 
+                    'GROUPLEADS',[],'groupvector',...
+                    'GROUPEXTENSION','-ext','groupstring',...
+                    'GROUPGEOM','','groupfile',...
+                    'GROUPCHANNELS','','groupfile',...
+                    'GROUPBADLEADSFILE','','groupfile',...
+                    'GROUPBADLEADS',[],'groupvector',...
+                    'GROUPDONOTPROCESS',0,'groupbool',...
+                    'GROUPSELECT',0,'select',...
+                    'DO_CALIBRATE',1,'bool',...
+                    'DO_BLANKBADLEADS',1,'bool',...
+                    'DO_SLICE',1,'bool',...
+                    'DO_SLICE_USER',1,'bool',...
+                    'DO_ADDBADLEADS',0,'bool',...
+                    'DO_SPLIT',1,'bool',...
+                    'DO_BASELINE',1,'bool',...
+                    'DO_BASELINE_RMS',0,'bool',...
+                    'DO_BASELINE_USER',1,'bool',...
+                    'DO_DELTAFOVERF',0,'bool',...
+                    'DO_DETECT',1,'bool',...
+                    'DO_DETECT_USER',1,'bool',...
+                    'DO_DETECT_LOADTSDFC',1,'bool',...
+                    'DO_DETECT_AUTO',1,'bool',...
+                    'DO_DETECT_PACING',1,'bool',...
+                    'DO_LAPLACIAN_INTERPOLATE',1,'bool',...
+                    'DO_INTERPOLATE',0,'bool',...
+                    'DO_INTEGRALMAPS',1,'bool',...
+                    'DO_ACTIVATIONMAPS',1,'bool',...
+                    'DO_FILTER',0,'bool',...
+                    'SAMPLEFREQ', 1000, 'double',...
+                    'NAVIGATION','apply','string',...
+                    'DISPLAYTYPE',1,'integer',...
+                    'DISPLAYTYPEF',1,'integer',...
+                    'DISPLAYSCALING',1,'integer',...
+                    'DISPLAYSCALINGF',1,'integer',...
+                    'DISPLAYOFFSET',1,'integer',...
+                    'DISPLAYGRID',1,'integer',...
+                    'DISPLAYGRIDF',1,'integer',...
+                    'DISPLAYLABEL',1,'integer',...
+                    'DISPLAYLABELF',1,'integer',...
+                    'DISPLAYTYPEF1',1,'integer',...
+                    'DISPLAYTYPEF2',1,'integer',...
+                    'DISPLAYPACING',1,'integer',...
+                    'DISPLAYPACINGF',1,'integer',...
+                    'DISPLAYGROUP',1,'vector',...
+                    'DISPLAYGROUPF',1,'vector',...
+                    'DISPLAYSCALE',1,'integer',...
+                    'CURRENTTS',1,'integer',...
+                    'ALIGNSTART','detect','integer',...
+                    'ALIGNSIZE','detect','integer',...
+                    'ALIGNMETHOD',1,'integer',...
+                    'ALIGNSTARTENABLE',1,'integer',...
+                    'ALIGNSIZEENABLE',1,'integer',...
+                    'ALIGNRMSTYPE',1,'integer',...
+                    'ALIGNTHRESHOLD',0.9,'double',...
+                    'AVERAGEMETHOD',1,'integer',...
+                    'AVERAGERMSTYPE',1,'integer',...
+                    'AVERAGECHANNEL',1,'integer',...
+                    'AVERAGEMAXN',5,'integer',...
+                    'AVERAGEMAXRE',0.1,'double',...
+                    'KEEPBADLEADS',1,'integer',...
+                    'FIDSLOOPFIDS',1,'integer',...
+                    'LOOP_ORDER',1,'vector',...
+                    'FIDSAUTOACT',1,'integer',...
+                    'FIDSAUTOREC',1,'integer',...
+                    'FIDSAUTOPEAK',1,'integer',...
+                    'FIDSACTREV',0,'integer',...
+                    'FIDSRECREV',0,'integer',...
+                    'TSDFODIR','tsdf','string',...
+                    'TSDFODIRON',1,'bool',...
+                    'MATODIR','','string',...
+                    'ACTWIN',7,'integer',...
+                    'ACTDEG',3,'integer',...
+                    'ACTNEG',1,'integer',...
+                    'RECWIN',7,'integer',...
+                    'RECDEG',3,'integer',...
+                    'RECNEG',0,'integer',...
+                    'ALEADNUM',1,'integer',...
+                    'ADOFFSET',0.2,'double',...
+                    'ADISPLAYTYPE',1,'integer',...
+                    'ADISPLAYOFFSET',1,'integer',...
+                    'ADISPLAYGRID',1,'integer',...
+                    'ADISPLAYGROUP',1,'vector',...
+                    'OPTICALLABEL','','string',...
+                    'FILTERFILE','','string',...
+                    'FILTERNAME','NONE','string',...
+                    'FILTERNAMES',{'NONE'},'string',...
+                    'FILTER',[],'string',...
+                    'INPUTTSDFC','','string',...
+                    'RUNGROUPSELECT',0,'selectR',... 
+                    'RUNGROUPNAMES','RUNGROUP', 'rungroupstring',...
+                    'RUNGROUPFILES',[],'rungroupvector'... 
+                    'RUNGROUPMAPPINGFILE','','rungroupstring',...
+                    'RUNGROUPCALIBRATIONMAPPINGUSED','','rungroupstring',...
+                    'RUNGROUPFILECONTAIN', '', 'rungroupstring'    %for the SelectRungroupfiles 'contains' button
+            };
 end
 
 function str = myStrTrim(str)
