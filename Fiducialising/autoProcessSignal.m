@@ -1,4 +1,7 @@
 function autoProcessSignal()
+% this is going to be the function, that does "everything".. including
+% opening the 4 window, but also saving of files etc..    like
+% processAC2File
 
 %%%% get the inputs
 ats_ets='C:\alle Meine Workspaces von allen zusammen\Matlab workspaces\MatMatStuff\Fiducialising\testRuns\ats_ets.mat';

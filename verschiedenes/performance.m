@@ -5,6 +5,11 @@ cal='C:\alle Meine Workspaces von allen zusammen\Matlab workspaces\einzelneTestf
 map='C:\alle Meine Workspaces von allen zusammen\Matlab workspaces\einzelneTestfiles_Tank_10\34needles_247sock_192torso_channels.mapping';
 outputdir='C:\alle Meine Workspaces von allen zusammen\Matlab workspaces\einzelneTestfiles_Tank_10';
 
+
+
+checkLoadingTimesExistenseOfVariable
+return
+
 global TS
 index=ioReadTS(file3, cal, map);
 
@@ -139,4 +144,65 @@ savetime_v6=savetime_v6/nRuns
 % loadtime_v6=0.0637
 % savetime_v6=0.3276
 % filesize: 120MB
+
+
+
+
+
+function checkLoadingTimesExistenseOfVariable()
+
+% file='C:\alle Meine Workspaces von allen zusammen\Matlab workspaces\AllMatmapStuff\Testing\17-6-28 latestExp\Data\Preprocessed\Run0032.mat';
+% create file if needed:
+% ...
+
+%19mb file
+nRuns=10;
+matfile='withInfo.mat';
+tic
+for p=1:nRuns
+    load(matfile,'ts_info');
+    if exist('ts_info', 'var')
+        %do something
+    end
+end
+toc
+
+%simply loading the complete file
+tic
+for p=1:nRuns
+    load(matfile);
+    % do something with variable
+    if exist('ts_info','var')
+        %do something
+    end
+end
+toc
+
+% check with who
+tic
+for p=1:nRuns
+   variables=who('-file',matfile);
+   if ismember('ts_info', variables)
+       % do something
+   end
+end
+toc
+
+% % check with whose
+% tic
+% for p=1:nRuns
+%    info=whos('-file',matfile);
+%    if ismember('ts_info', {info.name})
+%        %do something
+%    end
+% end
+% toc
+
+% check with who
+tic
+for p=1:nRuns
+   ~isempty(who('-file', matfile, 'ts_info'));
+end
+toc
+
 

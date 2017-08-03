@@ -1,10 +1,10 @@
 function matches=findMatches(signal, kernel, accuracy)
-% finds kernel in signal.  retuns matches={[s1:e1], [s2:e2], ..[sn:en]} so that 
+% finds kernel in signal.  retuns matches={[s1,e1], [s2,e2], ..[sn,en]} so that 
 %  m=signal(si:ei) matches kernel for all i, "matches" means: xcorr(kernel,m,0,'coeff')>accuracy
 % it also:
-% - sorts the matches in order they appear in signal (m1 < m2 < .. < mi)
+% - sorts the matches in order they appear in signal (s1 < s2 < .. < si)
 % notes:
-% - doesnt blank out everything - so overlap is ok!
+% - does not blank out everything - so overlap is ok! see blankfraction
 
 
 blankfraction=0.4;   % only the middle 2*blankfraktion percentage part of match is blanked -> allows for overlap
@@ -34,7 +34,7 @@ while 1
     end
     ac=xcorr(kernel,signal(m1:m2),0,'coeff'); %actual correlation with zero lag, normalized
     if ac > accuracy   %if match is good enough
-        matches{end+1}=[m1:m2];
+        matches{end+1}=[m1,m2];
         
         % blank parts of it
         middle=round((m1+m2)/2);

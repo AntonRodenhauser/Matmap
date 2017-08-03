@@ -1,4 +1,6 @@
 function plotAutoProcFids(varargin)
+%this function opens the 4th window and deals with everything related to it
+
 
 if nargin > 1 % if callback of winAutoProcessing is to be executed
     feval(varargin{1},varargin{2:end});  % execute callback
@@ -34,15 +36,12 @@ kernel=signal(k1:k2);
 oriFids=ets.fids;
 oriFids=removeUnnecFids(oriFids,wantedFids);
 
+
 % get the fids for each beat (will be done more sophisticated late)
-tic
-for p=1:1000
-    matches=findMatches(signal, kernel, accuracy);
-end
-toc
 
+matches=findMatches(signal, kernel, accuracy);
 
-allFids{length(matches)}=1; %preallocate memory
+allFids{length(matches)}=1; %preallocate allFids
 for beatNumber=1:length(matches)
     reference=matches{beatNumber}(1);
     shiftedOriFids=oriFids;

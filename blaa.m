@@ -1,19 +1,13 @@
 function bla
 
-s1=tic;
-s2=tic;
-a=rand(200,200);
-b=rand(200,200);
-a=rand(200,200);
-b=rand(200,200);
-a=rand(200,200);
-b=rand(200,200);
-toc(s2)
+x=[1 2 3 4 5 6];
 
-s3=tic;
+s=2;
+e=4;
+kernel=x(s:e);
 
-c=a\b;
 
-toc(s3)
-toc(s1)
+length(kernel)
+
+e-s
 
