@@ -47,13 +47,13 @@ autoProcFig=plotAutoProcFids;
 waitfor(autoProcFig);
 
 
-% %%%% find oriBeatIdx, the index of the template beat
-% for beatNumber=1:length(AUTOPROCESSING.beats)
-%     if (AUTOPROCESSING.beats{beatNumber}(1)-AUTOPROCESSING.bsk) < 3  % if found beat "close enough" to original Beat 
-%         oriBeatIdx=beatNumber;
-%         break
-%     end
-% end
+%%%% find oriBeatIdx, the index of the template beat
+for beatNumber=1:length(AUTOPROCESSING.beats)
+    if (AUTOPROCESSING.beats{beatNumber}(1)-AUTOPROCESSING.bsk) < 3  % if found beat "close enough" to original Beat 
+        oriBeatIdx=beatNumber;
+        break
+    end
+end
 
 %%%%% main loop: process each beat.
 for beatNumber=1:length(AUTOPROCESSING.beats)    

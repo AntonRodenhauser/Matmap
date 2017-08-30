@@ -1,13 +1,7 @@
-function bla
-
-x=[1 2 3 4 5 6];
-
-s=2;
-e=4;
-kernel=x(s:e);
+function blaa
 
 
-length(kernel)
+x=1:10;
+a=false;
 
-e-s
-
+x([true false])

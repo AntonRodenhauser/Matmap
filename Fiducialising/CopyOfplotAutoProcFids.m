@@ -1,11 +1,11 @@
-function autoProcFig = plotAutoProcFids(varargin)
+function plotAutoProcFids(varargin)
 %this function opens the 4th window and deals with everything related to it
 
 if nargin > 1 % if callback of winAutoProcessing is to be executed
     feval(varargin{1},varargin{2:end});  % execute callback
 else
- %   setUpAllForTesting
-   autoProcFig = Init; % else initialize and open winAutoProcessing.fig
+    setUpAllForTesting
+    Init; % else initialize and open winAutoProcessing.fig
 end
 function setUpAllForTesting()
 %this is only for testing, remove at the end
@@ -21,8 +21,8 @@ leadsGr1=1:247;
 leadsGr2=248:547;
 
 % badleads
-badleads=[140,150, 157, 213:232, 293:300]+247;     % the global indices of leads that are bad accourding to wilson
-% [ 140 156 157,   [213:232 293:300]+247]  
+badleads=[140,150, 157, 213:232, 293:301]+247;     % the global indices of leads that are bad accourding to wilson
+
 leadsOfAllGroups=setdiff([leadsGr1, leadsGr2],badleads);  %signal (where the beat is found) will constitute of those.  got rid of badleads
 
 
@@ -67,7 +67,6 @@ AUTOPROCESSING.allFids=findAllFids(sts.potvals(AUTOPROCESSING.leadsToAutoprocess
 
 
 
-
 AUTOPROCESSING.ZOOMBOX=[];
 
 % set up globals, myScriptData
@@ -97,12 +96,12 @@ myScriptData.BASELINEWIDTH = 5;
 %%%%%%% actuall stuff starts here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function autoProcFig = Init
+function Init
 
-autoProcFig=winAutoProcessing;
-InitFiducials(autoProcFig)
-InitDisplayButtons(autoProcFig)
-SetupDisplay(autoProcFig);
+fig=winAutoProcessing;
+InitFiducials(fig)
+InitDisplayButtons(fig)
+SetupDisplay(fig);
 UpdateDisplay;
 
 
@@ -126,7 +125,7 @@ fig.Pointer='watch';
 
 global TS myScriptData AUTOPROCESSING;
 
-tsindex = myScriptData.unslicedDataIndex;
+tsindex = myScriptData.CURRENTTS;
 numframes = size(TS{tsindex}.potvals,2);
 AUTOPROCESSING.TIME = [1:numframes]*(1/myScriptData.SAMPLEFREQ);
 AUTOPROCESSING.XLIM = [1 numframes]*(1/myScriptData.SAMPLEFREQ);
@@ -138,12 +137,6 @@ AUTOPROCESSING.XSLIDER = findobj(allchild(fig),'tag','SLIDERX');
 AUTOPROCESSING.YSLIDER = findobj(allchild(fig),'tag','SLIDERY');
 
 
-% if no groups to display are selected yet (because e.g. first call) -> select all groups to display for autoprocessing
-if ~isfield(myScriptData,'DISPLAYGROUPA')
-    myScriptData.DISPLAYGROUPA=1:length(myScriptData.GROUPNAME{myScriptData.CURRENTRUNGROUP});
-end
-
-
 
 groups = myScriptData.DISPLAYGROUPA;
 numgroups = length(groups);
@@ -153,11 +146,7 @@ AUTOPROCESSING.GROUPNAME = {};
 AUTOPROCESSING.GROUP = [];
 AUTOPROCESSING.COLORLIST = {[1 0 0],[0 0.7 0],[0 0 1],[0.5 0 0],[0 0.3 0],[0 0 0.5],[1 0.3 0.3],[0.3 0.7 0.3],[0.3 0.3 1],[0.75 0 0],[0 0.45 0],[0 0 0.75]};
 
-%%%% select "show global RMS", if nothing else has been selected yet
-if ~isfield(myScriptData,'DISPLAYTYPEA')
-    myScriptData.DISPLAYTYPEA=1;
-end
-%%%% set up signals for global RMS, GROUP RMS or individual RMS
+% set up signals for global RMS, GROUP RMS or individual RMS
 switch myScriptData.DISPLAYTYPEA
     case 1   % show global RMS
         ch  = []; 
@@ -244,12 +233,7 @@ switch myScriptData.DISPLAYTYPEA
         set(findobj(allchild(fig),'tag','FIDSLOCAL'),'enable','on');
 end
 
-
-%%%% if no scaling has been selected yet, choose "local" as the default
-if ~isfield(myScriptData,'DISPLAYSCALINGA')
-    myScriptData.DISPLAYSCALINGA=1;
-end
-%%%% modify signal accourding to chosen Displayscaling
+% modify signal accourding to chosen Displayscaling
 switch myScriptData.DISPLAYSCALINGA
     case 1
         k = max(abs(AUTOPROCESSING.SIGNAL),[],2);
@@ -306,10 +290,7 @@ numframes = size(AUTOPROCESSING.SIGNAL,2);
 startframe = max([floor(myScriptData.SAMPLEFREQ*xwin(1)) 1]);
 endframe = min([ceil(myScriptData.SAMPLEFREQ*xwin(2)) numframes]);
 
-%%%% DRAW THE GRID
-if ~isfield(myScriptData,'DISPLAYGRIDA')
-    myScriptData.DISPLAYGRIDA=1;  % default is "no grid", if nothing else has been selected so far
-end
+% DRAW THE GRID
 if myScriptData.DISPLAYGRIDA > 1
     if myScriptData.DISPLAYGRIDA > 2
         clines = 0.04*[floor(xwin(1)/0.04):ceil(xwin(2)/0.04)];
@@ -324,21 +305,6 @@ end
 
 
 numchannels = size(AUTOPROCESSING.SIGNAL,1);
-
-
-
-%%%% if no scaling has been selected yet, choose "local" as the default
-if ~isfield(myScriptData,'DISPLAYSCALINGA')
-    myScriptData.DISPLAYSCALINGA=1;
-end
-
-
-%%%% if offset on/off has not been selected yet, choose 'on' as the default
-if ~isfield(myScriptData,'DISPLAYOFFSETA')
-    myScriptData.DISPLAYOFFSETA=1;
-end
-
-%%%% set up some stuff for offset
 if myScriptData.DISPLAYOFFSETA == 1
     chend = numchannels - max([floor(ywin(1)) 0]);
     chstart = numchannels - min([ceil(ywin(2)) numchannels])+1;
@@ -346,14 +312,6 @@ else
     chstart = 1;
     chend = numchannels;
 end
-
-
-%%%% if "show label" has not been selected yet for autoprocessing
-if ~isfield(myScriptData,'DISPLAYLABELA')
-    myScriptData.DISPLAYLABELA=1;
-end
-
-
 
 %%%% choose colors and plot
 for p=chstart:chend
