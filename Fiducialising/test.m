@@ -1,9 +1,7 @@
 function test()
 
-tic
+a={'aa','bb','cc'};
 
-C=A\B;
+x='aa';
 
-a=toc;
-
-disp(a)
+ismember(x,a)

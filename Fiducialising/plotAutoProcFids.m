@@ -708,7 +708,26 @@ switch tag
         set(findobj(allchild(window),'tag','FIDSLOCAL'),'value',1);
 end
 DisplayFiducials;
-    
+
+
+function KeyPress(fig)
+global AUTOPROCESSING
+key = real(fig.CurrentCharacter);
+
+if isempty(key), return; end
+if ~isnumeric(key), return; end
+
+switch key(1) 
+    case 32    % spacebar
+        Navigation(gcbf,'apply');
+    case {81,113}    % q/Q
+        Navigation(gcbf,'prev');
+    case {87,119}    % w
+        Navigation(gcbf,'stop');
+    case {69,101}    % e
+        Navigation(gcbf,'next');
+end
+
 
 %%%%%%% util functions %%%%%%%%%%%%%%%%%%%%%%%
 %TODO I think I dont need this

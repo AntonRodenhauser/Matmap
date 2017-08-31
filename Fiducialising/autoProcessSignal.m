@@ -21,10 +21,9 @@ badleads=find(TS{myScriptData.unslicedDataIndex}.leadinfo > 0);     % the global
 leadsOfAllGroups=[myScriptData.GROUPLEADS{crg}{:}];
 leadsOfAllGroups=setdiff(leadsOfAllGroups,badleads);  %signal (where the beat is found) will constitute of those.  got rid of badleads
 
-% set leadsToAutoprocess, the leads to find fiducials for and plot.  Only these leads will be used to compute the global fids
-%idxs=round(linspace(1,length(leadsOfAllGroups),nToBeFiducialised));
-
-idxs=randi([1,length(leadsOfAllGroups)],1,20);
+%%%% set leadsToAutoprocess, the leads to find fiducials for and plot.  Only these leads will be used to compute the global fids
+idxs=round(linspace(1,length(leadsOfAllGroups),nToBeFiducialised));
+%idxs=randi([1,length(leadsOfAllGroups)],1,nToBeFiducialised); % this is wrong, since it may create dublicates
 
 AUTOPROCESSING.leadsToAutoprocess=leadsOfAllGroups(idxs);
 
@@ -42,22 +41,20 @@ AUTOPROCESSING.allFids=findAllFids(TS{unslicedDataIndex}.potvals(AUTOPROCESSING.
 
 
 %%%% plot the found fids, let the user check them and make corrections
-autoProcFig=plotAutoProcFids;
-%do not proceed to processing until user is done
-waitfor(autoProcFig);
+if myScriptData.AUTOFID_USER_INTERACTION
+    autoProcFig=plotAutoProcFids;
+    %do not proceed to processing until user is done
+    waitfor(autoProcFig);
+end
 
+% return, if user pressed 'Stop','Prev', or 'next'
+if ismember(myScriptData.NAVIGATION,{'prev','next','stop'})
+    return
+end
 
-% %%%% find oriBeatIdx, the index of the template beat
-% for beatNumber=1:length(AUTOPROCESSING.beats)
-%     if (AUTOPROCESSING.beats{beatNumber}(1)-AUTOPROCESSING.bsk) < 3  % if found beat "close enough" to original Beat 
-%         oriBeatIdx=beatNumber;
-%         break
-%     end
-% end
 
 %%%%% main loop: process each beat.
-for beatNumber=1:length(AUTOPROCESSING.beats)    
-    if beatNumber==oriBeatIdx, continue, end
+for beatNumber=2:length(AUTOPROCESSING.beats)    % skip the first beat, as this is the user fiducialized one
     processBeat(beatNumber)
 end
 
@@ -127,7 +124,7 @@ TS{newBeatIdx}.selframes=[beatframes(1),beatframes(end)];
 fids=AUTOPROCESSING.allFids{beatNumber};
 reference=beatframes(1);
 for fidNumber=1:length(fids)
-    fids(fidNumber).value=fids(fidNumber).value+reference-1;  % fids now in local frame
+    fids(fidNumber).value=fids(fidNumber).value-reference+1;  % fids now in local frame
 end
 fids=rmfield(fids,'variance');  %variance not wanted in the output
 TS{newBeatIdx}.fids=fids;
@@ -155,7 +152,7 @@ if myScriptData.FIDSAUTOREC == 1, DetectRecovery(newBeatIdx); end
 
 %%%% construct the filename  (add eg '-b10' to filename)
 [~,filename,~]=fileparts(TS{myScriptData.unslicedDataIndex}.filename);
-filename=sprintf('%s-b%d',filename,beatNumber); 
+filename=sprintf('%s-b%d',filename,beatNumber-1); 
 
 
 %%%% split TS{newIdx} into numGroups smaller ts in grIndices
@@ -244,11 +241,20 @@ act = ones(numchannels,1)*(1/myScriptData.SAMPLEFREQ);
 
 
 %%%% qstart/end=QRS-Komplex-start/end-timeframe as saved in the fids
-qstart_idx=[TS{newBeatIdx}.fids.type]==2;  % TODO: if no qrs exists?
-qstart = TS{newBeatIdx}.fids(qstart_idx).value * ones(numchannels,1);
-
-qend_idx=[TS{newBeatIdx}.fids.type]==4;
-qend = TS{newBeatIdx}.fids(qend_idx).value * ones(numchannels,1);
+qstart_indeces=find([TS{newBeatIdx}.fids.type]==2);  % TODO: if no qrs exists?qend_idx=[TS{newBeatIdx}.fids.type]==4;
+qend_indeces=find([TS{newBeatIdx}.fids.type]==4);
+for qstart_idx=qstart_indeces % loop trought to find global qrs
+    if length(TS{newBeatIdx}.fids(qstart_idx).value) == 1
+        qstart = TS{newBeatIdx}.fids(qstart_idx).value * ones(numchannels,1);
+        break
+    end
+end
+for qend_idx=qend_indeces % loop trought to find global qrs
+    if length(TS{newBeatIdx}.fids(qend_idx).value) == 1
+        qend = TS{newBeatIdx}.fids(qend_idx).value * ones(numchannels,1);
+        break
+    end
+end
 
 
 
@@ -269,7 +275,18 @@ for leadNumber=1:numchannels
     if isfield(TS{newBeatIdx},'noisedrange')
         act(leadNumber) = (ARdetect(TS{newBeatIdx}.potvals(leadNumber,round(myScriptData.SAMPLEFREQ*qs(leadNumber)):round(myScriptData.SAMPLEFREQ*qe(leadNumber))),win,deg,neg,TS{newBeatIdx}.noisedrange(leadNumber))-1)/myScriptData.SAMPLEFREQ + qs(leadNumber);
     else
-        [act(leadNumber)] = (ARdetect(TS{newBeatIdx}.potvals(leadNumber,round(myScriptData.SAMPLEFREQ*qs(leadNumber)):round(myScriptData.SAMPLEFREQ*qe(leadNumber))),win,deg,neg)-1)/myScriptData.SAMPLEFREQ + qs(leadNumber);
+        try
+            [act(leadNumber)] = (ARdetect(TS{newBeatIdx}.potvals(leadNumber,round(myScriptData.SAMPLEFREQ*qs(leadNumber)):round(myScriptData.SAMPLEFREQ*qe(leadNumber))),win,deg,neg)-1)/myScriptData.SAMPLEFREQ + qs(leadNumber);
+            disp('works')
+        catch
+            newBeatIdx
+            size(TS{newBeatIdx}.potvals)
+            leadNumber
+            round(myScriptData.SAMPLEFREQ*qs(leadNumber))
+            round(myScriptData.SAMPLEFREQ*qe(leadNumber))
+            error('end it here')
+        end
+            
     end
 end
 
@@ -296,11 +313,30 @@ tend = zeros(numchannels,1);
 rec = ones(numchannels)*(1/myScriptData.SAMPLEFREQ);  
 
 %%%% get tstart/end as saved in the fids
-tstart_idx=[TS{newBeatIdx}.fids.type]==5;  % TODO: if no qrs exists?
+tstart_idx=[TS{newBeatIdx}.fids.type]==5;  % TODO: if no t wave exists?
 tstart = TS{newBeatIdx}.fids(tstart_idx).value * ones(numchannels,1);
 
 tend_idx=[TS{newBeatIdx}.fids.type]==7;
 tend = TS{newBeatIdx}.fids(tend_idx).value * ones(numchannels,1);
+
+
+tstart_indeces=find([TS{newBeatIdx}.fids.type]==5);  % TODO: if no qrs exists?qend_idx=[TS{newBeatIdx}.fids.type]==4;
+tend_indeces=find([TS{newBeatIdx}.fids.type]==7);
+for tstart_idx=tstart_indeces % loop trought to find global qrs
+    if length(TS{newBeatIdx}.fids(tstart_idx).value) == 1
+        tstart = TS{newBeatIdx}.fids(tstart_idx).value * ones(numchannels,1);
+        break
+    end
+end
+for tend_idx=tend_indeces % loop trought to find global qrs
+    if length(TS{newBeatIdx}.fids(tend_idx).value) == 1
+        tend = TS{newBeatIdx}.fids(tend_idx).value * ones(numchannels,1);
+        break
+    end
+end
+
+
+
 
 %%%% sort values
 ts = min([tstart tend],[],2);
