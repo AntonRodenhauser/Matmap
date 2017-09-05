@@ -396,7 +396,24 @@ for beatNumber=1:length(AUTOPROCESSING.allFids)
     AUTOPROCESSING.EVENTS{beatNumber}{3}.handle = [];
 end
 
+%%%% plot the beatNumber as text
+for beatNumber=1:length(AUTOPROCESSING.allFids)
+    %first check if beat is within window
+    beatStart = AUTOPROCESSING.beats{beatNumber}(1)/myScriptData.SAMPLEFREQ;
+    beatEnd = AUTOPROCESSING.beats{beatNumber}(2)/myScriptData.SAMPLEFREQ;
+    if beatStart > AUTOPROCESSING.XWIN(2) || beatEnd < AUTOPROCESSING.XWIN(1)
+        continue   % beat is not in window, so don't plot it.
+    end
+    
+    % now plot the text
+    txt=sprintf('beat %d',beatNumber);
+    text(beatStart,AUTOPROCESSING.YWIN(2),txt,'VerticalAlignment','top','HorizontalAlignment','left','FontSize',17)   
+end
+
+
+
 DisplayFiducials;
+
 
 function DisplayFiducials
 % this functions plotts the lines/patches when u select the fiducials
@@ -405,6 +422,22 @@ function DisplayFiducials
 global myScriptData AUTOPROCESSING;
 
 for beatNumber=1:length(AUTOPROCESSING.EVENTS)   %for each beat
+    
+    %%%% first check if beat is within window, othterwise its not necessary
+    %to plot that beat
+    
+    beatStart = AUTOPROCESSING.beats{beatNumber}(1)/myScriptData.SAMPLEFREQ;
+    beatEnd = AUTOPROCESSING.beats{beatNumber}(2)/myScriptData.SAMPLEFREQ;
+    
+    if beatStart > AUTOPROCESSING.XWIN(2) || beatEnd < AUTOPROCESSING.XWIN(1)
+        continue   % beat is not in window, so don't plot it.
+    end
+    
+    
+    
+    
+    
+    
     % GLOBAL EVENTS
     events = AUTOPROCESSING.EVENTS{beatNumber}{1};
      if ~isempty(events.handle), index = find(ishandle(events.handle(:)) & (events.handle(:) ~= 0)); delete(events.handle(index)); end   %delete any existing lines
@@ -499,7 +532,25 @@ for beatNumber=1:length(AUTOPROCESSING.EVENTS)   %for each beat
     end
     AUTOPROCESSING.EVENTS{beatNumber}{3} = events;
 end
-    
+
+
+
+function zoomIntoBeat(beatNumber)
+global AUTOPROCESSING myScriptData
+beatStart = AUTOPROCESSING.beats{beatNumber}(1)/myScriptData.SAMPLEFREQ;
+beatEnd = AUTOPROCESSING.beats{beatNumber}(2)/myScriptData.SAMPLEFREQ;
+beatLenght = beatEnd-beatStart;
+
+AUTOPROCESSING.XWIN =[beatStart-0.2*beatLenght, beatEnd+0.2*beatLenght];
+
+UpdateDisplay
+
+
+
+
+
+
+
 
 function potvals=temporalFilter(potvals)
 % TODO, this should not be needed here
@@ -689,6 +740,8 @@ switch cbobj.Tag
     otherwise
         UpdateDisplay
 end
+
+zoomIntoBeat(10)
 
 
 function SetFids(handle)

@@ -273,20 +273,9 @@ neg = myScriptData.ACTNEG;
 for leadNumber=1:numchannels
  %for each lead in each group = for all leads..  
     if isfield(TS{newBeatIdx},'noisedrange')
-        act(leadNumber) = (ARdetect(TS{newBeatIdx}.potvals(leadNumber,round(myScriptData.SAMPLEFREQ*qs(leadNumber)):round(myScriptData.SAMPLEFREQ*qe(leadNumber))),win,deg,neg,TS{newBeatIdx}.noisedrange(leadNumber))-1)/myScriptData.SAMPLEFREQ + qs(leadNumber);
+        act(leadNumber) = (ARdetect(TS{newBeatIdx}.potvals(leadNumber,qs(leadNumber):qe(leadNumber)),win,deg,neg,TS{newBeatIdx}.noisedrange(leadNumber))-1)/myScriptData.SAMPLEFREQ + qs(leadNumber);
     else
-        try
-            [act(leadNumber)] = (ARdetect(TS{newBeatIdx}.potvals(leadNumber,round(myScriptData.SAMPLEFREQ*qs(leadNumber)):round(myScriptData.SAMPLEFREQ*qe(leadNumber))),win,deg,neg)-1)/myScriptData.SAMPLEFREQ + qs(leadNumber);
-            disp('works')
-        catch
-            newBeatIdx
-            size(TS{newBeatIdx}.potvals)
-            leadNumber
-            round(myScriptData.SAMPLEFREQ*qs(leadNumber))
-            round(myScriptData.SAMPLEFREQ*qe(leadNumber))
-            error('end it here')
-        end
-            
+        [act(leadNumber)] = (ARdetect(TS{newBeatIdx}.potvals(leadNumber,qs(leadNumber):qe(leadNumber)),win,deg,neg)-1)/myScriptData.SAMPLEFREQ + qs(leadNumber);
     end
 end
 
@@ -313,28 +302,20 @@ tend = zeros(numchannels,1);
 rec = ones(numchannels)*(1/myScriptData.SAMPLEFREQ);  
 
 %%%% get tstart/end as saved in the fids
-tstart_idx=[TS{newBeatIdx}.fids.type]==5;  % TODO: if no t wave exists?
-tstart = TS{newBeatIdx}.fids(tstart_idx).value * ones(numchannels,1);
-
-tend_idx=[TS{newBeatIdx}.fids.type]==7;
-tend = TS{newBeatIdx}.fids(tend_idx).value * ones(numchannels,1);
-
-
 tstart_indeces=find([TS{newBeatIdx}.fids.type]==5);  % TODO: if no qrs exists?qend_idx=[TS{newBeatIdx}.fids.type]==4;
 tend_indeces=find([TS{newBeatIdx}.fids.type]==7);
-for tstart_idx=tstart_indeces % loop trought to find global qrs
+for tstart_idx=tstart_indeces % loop trought to find global t wave
     if length(TS{newBeatIdx}.fids(tstart_idx).value) == 1
         tstart = TS{newBeatIdx}.fids(tstart_idx).value * ones(numchannels,1);
         break
     end
 end
-for tend_idx=tend_indeces % loop trought to find global qrs
+for tend_idx=tend_indeces % loop trought to find global t wave
     if length(TS{newBeatIdx}.fids(tend_idx).value) == 1
         tend = TS{newBeatIdx}.fids(tend_idx).value * ones(numchannels,1);
         break
     end
 end
-
 
 
 
@@ -349,7 +330,7 @@ neg = myScriptData.RECNEG;
 
 %%%% get the recovery values for each lead
 for leadNumber=1:numchannels
-    rec(leadNumber) = ARdetect(TS{newBeatIdx}.potvals(leadNumber,round(myScriptData.SAMPLEFREQ*ts(leadNumber)):round(myScriptData.SAMPLEFREQ*te(leadNumber))),win,deg,neg)/myScriptData.SAMPLEFREQ + ts(leadNumber);
+    rec(leadNumber) = ARdetect(TS{newBeatIdx}.potvals(leadNumber,ts(leadNumber):te(leadNumber)),win,deg,neg)/myScriptData.SAMPLEFREQ + ts(leadNumber);
 end
 
 %%%% put the recovery values in fids
