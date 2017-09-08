@@ -1,7 +1,3 @@
 function blaa
 
-
-x=1:10;
-a=false;
-
-x([true false])
+plot([1 2],[1 2],'Color','r','Linestyle',)
